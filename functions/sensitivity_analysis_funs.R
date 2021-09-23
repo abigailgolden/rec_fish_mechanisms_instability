@@ -14,7 +14,7 @@ simulate_along <- function(par_range, params, par_id, utilfun, Emax, Bmsy, msy, 
   progress_bar = txtProgressBar(min=0, max=length(range), style = 1, char="=")
   for (i in 1:length(range)){
     params[par_id] <- range[i]
-    dat <- sim_multisite(params = params, nsims = nsims, Emax = Emax, Bmsy = Bmsy, utilfun = utilfun)
+    dat <- simulate(params = params, nsims = nsims, Emax = Emax, Bmsy = Bmsy, utilfun = utilfun)
     dat2 <- summarise_all(dat, mean) %>% 
       pivot_longer(cols = 1:6, names_to = "varname", 
                    values_to = "val") %>% 
@@ -53,7 +53,6 @@ scale_output <- function(dat, ref_param_val) {
 }
 
 # function to make heatmap of outcome variables
-
 outvar_heatmap <- function(dat, title = dat$cr_fun, dat_range, emp_dat, xlab, ref, ylabelling = TRUE){
   if(ylabelling == TRUE){
     labs <- c("CV of effort", 
@@ -61,10 +60,10 @@ outvar_heatmap <- function(dat, title = dat$cr_fun, dat_range, emp_dat, xlab, re
               "Cumulative effort",
               "Cumulative catch",
               "Proportion extirpated",
-               "Proportion of\nyears overfished")
+              "Proportion of\nyears overfished")
   }else{
     labs <- NULL
-    }
+  }
   
   ggplot()+
     scale_y_discrete(limits = levels(dat$varname),
@@ -74,7 +73,9 @@ outvar_heatmap <- function(dat, title = dat$cr_fun, dat_range, emp_dat, xlab, re
                               varname == "prop_extirpated"),
               aes(x = param_val, 
                   y = varname, 
-                  fill = val))+
+                  fill = val),
+              #  width = 0.01, height = 1
+    )+
     scale_fill_distiller(type = "seq", palette = "Reds", direction = 1,
                          name = "Proportion",
                          limits = c(0,1),
@@ -86,11 +87,13 @@ outvar_heatmap <- function(dat, title = dat$cr_fun, dat_range, emp_dat, xlab, re
                               varname == "cumulative_effort"),
               aes(x = param_val, 
                   y = varname, 
-                  fill = pct_change))+
+                  fill = pct_change),
+              # width = 0.01, height = 1
+    )+
     scale_fill_distiller(type = "div", palette = "PiYG", direction = 1,
                          name = "% change in\ncumulative\nsocial benefits",
                          limits = c(-1*max(abs(dat_range[2,4:5])),
-                                           max(abs(dat_range[2,4:5]))),
+                                    max(abs(dat_range[2,4:5]))),
                          guide = guide_legend(order = 2),
                          na.value = "white")+
     new_scale_fill()+
@@ -98,12 +101,21 @@ outvar_heatmap <- function(dat, title = dat$cr_fun, dat_range, emp_dat, xlab, re
                             varname == "cv_effort" |
                               varname == "cv_biomass"),
               aes(x = param_val, y = varname, 
-                  fill = val))+
+                  fill = val),
+              # width = 0.01, height = 1
+    )+
     scale_fill_distiller(type = "seq", palette = "BuPu", direction = 1,
                          name = "Coefficient\nof variation",
                          limits = c(0, ifelse(dat_range$max_val[3] < 2, 2, dat_range$max_val[3])),
                          guide = guide_legend(order = 3),
                          na.value = "white")+
+    # scale_fill_gradient2(low = "#9ecae1", mid = "white", high = "red",
+    #                      limits = c(0, 
+    #                                 ifelse(dat_range$max_val[3] < 2, 2, 
+    #                                        dat_range$max_val[3])), 
+    #                      midpoint = 1,
+    #                      name = "Coefficient\nof variation",
+    #                      guide = guide_legend(order = 3))+
     geom_vline(xintercept = emp_dat, linetype = 2)+
     geom_vline(xintercept = ref, linetype = 1, size = 1.2)+
     labs(title = title, 
@@ -111,4 +123,6 @@ outvar_heatmap <- function(dat, title = dat$cr_fun, dat_range, emp_dat, xlab, re
          y = NULL)+
     theme_classic()
 }
+
+
 

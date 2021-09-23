@@ -49,14 +49,14 @@ recAR <- function(prev_ar, sdrec){
 # calculate recruitment
 
 recruit <- function(ar, b, dt){
-    ((alpha*b*dt)/(1+beta*b*dt))*exp(ar)
+    ((alpha_rec*b*dt)/(1+beta_rec*b*dt))*exp(ar)
 }
 
 ## calculate catch based on fishing mortality, selectivity at age, N at age, and catchability beta
 
 catch <- function(n, Mf){
   # find vulnerable pop. of fish across ages
-  v <- apply(n, c(2), function(x) sum(sel*x^beta_c))
+  v <- apply(n, c(2), function(x) sum(sel*x^beta))
   # catch is a proportion of this
   Mf*v
 }
