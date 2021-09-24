@@ -104,7 +104,7 @@ simulate <- function(params, nsims, utilfun, Emax, Bmsy = Bmsy, msy = msy, ts = 
   d <- params[1]
   sdrec <- params[2]
   rho <- params[3]
-  beta_ <- params[4]
+  beta <- params[4]
 
   # create empty matrices to hold calculations of abundance, biomass, depensation, etc.
 
