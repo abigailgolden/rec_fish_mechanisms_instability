@@ -17,7 +17,6 @@ library(viridis)
 library(patchwork)
 library(gridExtra)
 library(ggpubr)
-library(lubridate)
 
 outfig <- here::here("figures")
 
