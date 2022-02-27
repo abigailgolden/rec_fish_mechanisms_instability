@@ -61,6 +61,13 @@ catch <- function(n, Mf){
   Mf*v
 }
 
+# logistic angler effort function with varying intercept and steepness
+# c = intercept
+# a = steepness
+
+logistic <- function(c, a, x){
+  (c*exp(a*x))/(c*exp(a*x) + (1-c))
+}
 
 # Functions to calculate outcome variables ---------------------------------
 

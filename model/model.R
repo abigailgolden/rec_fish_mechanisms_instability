@@ -41,7 +41,7 @@ R0 <- 1      # recruits per spawner at equilibrium
 RecK <- 10   # compensation ratio
 gamma <- 1   # gamma parameter of Deriso stock-recruit function
 qfish <- 0.01  #catchability coefficient
-c50 <- 0.1   # scaling parameter for catch
+c50 <- 0.05 # scaling parameter for catch
 
 
 # Parameters of interest --------------------------------------------------
@@ -51,8 +51,10 @@ sdrec <- 0  ## when sdrec = 0, turns off stochasticity in recruitment
 rho <- 0.43 ## when rho = 0, there is no autocorrelation in the recruitment residuals
 ## default to 0.43, because the "switch" we're interested in is stochasticity vs determinism, not the degree of autocorrelation
 beta <- 1   ## when beta = 1, relationship between abundance and CPUE is linear
+int <- 0.45 # the y-intercept represents the probability of fishing when catch is zero; min intercept in our dataset is 0.01, max is 0.45
+stp <- 5  # the steepness of the logistic curve indicates how rapidly the probability of fishing increases as catch rates increase; evaluate at two orders of magnitude, 0.5 and 5
 
-param_vec <- c(d, sdrec, rho, beta)
+param_vec <- c(d, sdrec, rho, beta, int, stp)
 
 
 # Calculated parameters -------------------------------------------------
@@ -90,20 +92,25 @@ nsims <- 100
 ##### Function to run model ------------------------------------------
 
 # function requires the following arguments:
-# 1. params: a vector of parameter values to use. Vector must be length 4 and be ordered as follows: depensation parameter d, recruitment variability standard deviation, recruitment variability parameter rho, density-dependent catchability parameter beta
+# 1. params: a vector of parameter values to use. Vector must be length 6 and be ordered as follows: depensation parameter d, recruitment variability standard deviation, recruitment variability parameter rho, density-dependent catchability parameter beta, the intercept of the angler effort function, and the steepness of the angler effort function
 # 2. nsims: number of simulations to iterate over
 # 3. utilfun: the angler effort function to use
 # 4. Emax: maximum effort that anglers can exert
 # 5. Bmsy: biomass that produces MSY
 # 6. msy: maximum sustained yield
 # 7. ts: a true/false argument indicating either to return outcome variables (if FALSE) or turn time series of biomass, effort, etc. (if TRUE)
+
+params <- param_vec
+Emax <- 48
  
-simulate <- function(params, nsims, utilfun, Emax, Bmsy = Bmsy, msy = msy, ts = FALSE){
+simulate <- function(params, nsims, Emax, Bmsy = Bmsy, msy = msy, ts = FALSE){
   
   d <- params[1]
   sdrec <- params[2]
   rho <- params[3]
   beta <- params[4]
+  intercept <- params[5]
+  steepness <- params[6]
 
   # create empty matrices to hold calculations of abundance, biomass, depensation, etc.
 
@@ -147,7 +154,7 @@ for (y in 1:t){
     if(y >= 2){
       
       
-      Pf[y,] <- do.call(utilfun, args = list(x = Ct[y-1,], c50 = c50))
+      Pf[y,] <- logistic(c = intercept, a = steepness, x = Ct[y-1,]/c50)
       Et[y,] <- Emax*Pf[y,]
       f[y,] <- qfish*Et[y,]
       Ct[y,] <- catch(n = N_at_age[y-1,,], Mf = f[y,])
@@ -203,7 +210,5 @@ outvars$prop_extirpated <- extirpation(final_rec = N_at_age[200,1,])
     return(outdat)
   }
 }
-
-
 
 
