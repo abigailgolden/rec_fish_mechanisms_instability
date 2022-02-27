@@ -65,8 +65,11 @@ catch <- function(n, Mf){
 # c = intercept
 # a = steepness
 
+
 logistic <- function(c, a, x){
-  (c*exp(a*x))/(c*exp(a*x) + (1-c))
+  y <- (c*exp(a*x))/(c*exp(a*x) + (1-c))
+  y2 <- ifelse(y == "NaN", 1, y)
+  return(y2)
 }
 
 # Functions to calculate outcome variables ---------------------------------

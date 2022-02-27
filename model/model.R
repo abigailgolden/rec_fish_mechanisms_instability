@@ -41,7 +41,7 @@ R0 <- 1      # recruits per spawner at equilibrium
 RecK <- 10   # compensation ratio
 gamma <- 1   # gamma parameter of Deriso stock-recruit function
 qfish <- 0.01  #catchability coefficient
-c50 <- 0.05 # scaling parameter for catch
+c50 <- 0.01 # scaling parameter for catch
 
 
 # Parameters of interest --------------------------------------------------

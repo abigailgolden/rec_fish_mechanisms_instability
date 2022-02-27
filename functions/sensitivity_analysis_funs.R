@@ -7,20 +7,21 @@ library(patchwork)
 
 # function to simulate along a range of parameter values
 
-simulate_along <- function(par_range, params, par_id, utilfun, Emax, Bmsy, msy, utilname){
+simulate_along <- function(par_range, params, par_id, Emax, Bmsy, msy){
   range <- par_range
-  params <- param_vec
+  parameters <- params
   outlist <- list()
   progress_bar = txtProgressBar(min=0, max=length(range), style = 1, char="=")
   for (i in 1:length(range)){
     params[par_id] <- range[i]
-    dat <- simulate(params = params, nsims = nsims, Emax = Emax, Bmsy = Bmsy, utilfun = utilfun)
+    dat <- simulate(params = parameters, nsims = nsims, Emax = Emax, Bmsy = Bmsy)
     dat2 <- summarise_all(dat, mean) %>% 
       pivot_longer(cols = 1:6, names_to = "varname", 
                    values_to = "val") %>% 
       mutate(param_name = param_names[par_id],
              param_val = range[i],
-             cr_fun = utilname)
+             int = parameters[5],
+             stp = parameters[6])
     outlist[[i]] <- dat2
     setTxtProgressBar(progress_bar, value = i)
   }

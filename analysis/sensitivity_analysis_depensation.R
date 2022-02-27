@@ -6,8 +6,8 @@ source("model/model.R")
 source("functions/sensitivity_analysis_funs.R")
 
 
-param_vec <- c(0.001, 0, 0.430, 1.000)
-param_names <- c("d", "sd", "rho", "beta")
+param_vec <- c(0.001, 0, 0.430, 1.000, 0.01, 5)
+param_names <- c("d", "sd", "rho", "beta", "int", "stp")
 
 
 dep_range <- seq(0.001, 0.301, by = 0.005)
@@ -17,18 +17,18 @@ Bmsy <- 0.00001474532
 
 # Run sensitivity analysis along observed range of depensation parameter d --------------------------------------------
 
-dep_kur_hms <- simulate_along(par_range = dep_range, params = param_vec, par_id = 1, utilfun = Pi_kur_hms, Emax = 48, Bmsy = 0.00001437875, msy = 0.3998861, utilname = "kur_hms")
-dep_kur_bottom <- simulate_along(par_range = dep_range, params = param_vec, par_id = 1, utilfun = Pi_kur_bottom, Emax = 48, Bmsy = 0.00001407869, utilname = "kur_bottom")
-dep_rag_prize <- simulate_along(par_range = dep_range, params = param_vec, par_id = 1, utilfun = Pi_rag_prize, Emax = 48, Bmsy = 0.00001436646, utilname = "rag_prize")
-dep_whi_sg <- simulate_along(par_range = dep_range, params = param_vec, par_id = 1, utilfun = Pi_whi_sg, Emax = 48, utilname = "whi_sg")
+dep_li_ls <- simulate_along(par_range = dep_range, params = c(0.001, 0, 0.430, 1.000, 0.01, 1), par_id = 1, Emax = 48, Bmsy = 0.00001437875, msy = 0.3998861)
+dep_li_hs <- simulate_along(par_range = dep_range, params = c(0.001, 0, 0.430, 1.000, 0.01, 10), par_id = 1, Emax = 48, Bmsy = 0.00001407869)
+dep_hi_ls <- simulate_along(par_range = dep_range, params = c(0.001, 0, 0.430, 1.000, 0.45, 1), par_id = 1, Emax = 48, Bmsy = 0.00001436646)
+dep_hi_hs <- simulate_along(par_range = dep_range, params = c(0.001, 0, 0.430, 1.000, 0.45, 10), par_id = 1, Emax = 48)
 
 
-scaled_dat_kur_hms <- scale_output(dat = dep_kur_hms, ref_param_val = 0.001)
-scaled_dat_kur_bottom <- scale_output(dat = dep_kur_bottom, ref_param_val = 0.001)
-scaled_dat_rag_prize <- scale_output(dat = dep_rag_prize, ref_param_val = 0.001)
-scaled_dat_whi_sg <- scale_output(dat = dep_whi_sg, ref_param_val = 0.001)
+scaled_dat_li_ls <- scale_output(dat = dep_li_ls, ref_param_val = 0.001)
+scaled_dat_li_hs <- scale_output(dat = dep_li_hs, ref_param_val = 0.001)
+scaled_dat_hi_ls <- scale_output(dat = dep_hi_ls, ref_param_val = 0.001)
+scaled_dat_hi_hs <- scale_output(dat = dep_hi_hs, ref_param_val = 0.001)
 
-dat_all <- rbind(scaled_dat_kur_hms, scaled_dat_kur_bottom, scaled_dat_rag_prize, scaled_dat_whi_sg)
+dat_all <- rbind(scaled_dat_li_ls, scaled_dat_li_hs, scaled_dat_hi_ls, scaled_dat_hi_hs)
 dat_range <- dat_all %>% 
   group_by(type) %>% 
   summarize(min_val = min(val),
@@ -40,32 +40,32 @@ dat_range <- dat_all %>%
 
 # Visualize output --------------------------------------------------------
 
-dep_kur_hms_plot <- outvar_heatmap(dat = scaled_dat_kur_hms, 
+dep_li_ls_plot <- outvar_heatmap(dat = scaled_dat_li_ls, 
                                    ref = 0.001,
-                                   title = "A) High intercept, low steepness",
+                                   title = "A) Low intercept, low steepness",
                                    dat_range = dat_range,
                                    emp_dat= emp_dep,
                                    xlab =NULL, ylabelling = TRUE)
 
 
-dep_kur_bottom_plot <- outvar_heatmap(dat = scaled_dat_kur_bottom, 
+dep_li_hs_plot <- outvar_heatmap(dat = scaled_dat_li_hs, 
                                       ref = 0.001,
-                                      title = "B) High intercept, high steepness",
+                                      title = "B) Low intercept, high steepness",
                                       dat_range = dat_range,
                                       emp_dat= emp_dep,
                                       xlab = NULL,
                                       ylabelling = FALSE)
 
-dep_rag_prize_plot <- outvar_heatmap(dat = scaled_dat_rag_prize, 
+dep_hi_ls_plot <- outvar_heatmap(dat = scaled_dat_hi_ls, 
                                      ref = 0.001,
-                                     title = "C) Low intercept, low steepness",
+                                     title = "C) High intercept, low steepness",
                                      dat_range = dat_range,
                                      emp_dat= emp_dep,
                                      xlab = "Depensation parameter d")
 
-dep_whi_sg_plot <- outvar_heatmap(dat = scaled_dat_whi_sg, 
+dep_hi_hs_plot <- outvar_heatmap(dat = scaled_dat_hi_hs, 
                                   ref = 0.001,
-                                  title = "D) Low intercept, high steepness",
+                                  title = "D) High intercept, high steepness",
                                   dat_range = dat_range,
                                   emp_dat= emp_dep,
                                   xlab = "Depensation parameter d",
@@ -74,7 +74,7 @@ dep_whi_sg_plot <- outvar_heatmap(dat = scaled_dat_whi_sg,
 figname <- "figS1_depensation_sensitivity_analysis.png"
 png(paste(outfig, figname, sep = "/"), width = 12, height = 10, units = "in", res = 1000)
 
-(dep_kur_hms_plot + dep_kur_bottom_plot) / (dep_rag_prize_plot + dep_whi_sg_plot) +plot_layout(guides = "collect")
+(dep_hi_ls_plot + dep_hi_hs_plot) / (dep_li_ls_plot + dep_li_hs_plot) +plot_layout(guides = "collect")
 
 dev.off()
 graphics.off()
