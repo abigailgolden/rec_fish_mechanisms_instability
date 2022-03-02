@@ -13,7 +13,7 @@ simulate_along <- function(par_range, params, par_id, Emax, Bmsy, msy){
   outlist <- list()
   progress_bar = txtProgressBar(min=0, max=length(range), style = 1, char="=")
   for (i in 1:length(range)){
-    params[par_id] <- range[i]
+    parameters[par_id] <- range[i]
     dat <- simulate(params = parameters, nsims = nsims, Emax = Emax, Bmsy = Bmsy)
     dat2 <- summarise_all(dat, mean) %>% 
       pivot_longer(cols = 1:6, names_to = "varname", 
