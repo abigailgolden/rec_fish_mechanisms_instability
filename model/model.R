@@ -41,18 +41,19 @@ R0 <- 1      # recruits per spawner at equilibrium
 RecK <- 10   # compensation ratio
 gamma <- 1   # gamma parameter of Deriso stock-recruit function
 qfish <- 0.01  #catchability coefficient
-c50 <- 0.01 # scaling parameter for catch
+c50 <- 0.1 # scaling parameter for catch
 
 
 # Parameters of interest --------------------------------------------------
 
-d <- 0.001   ## when d approaches 0, no depensation; d = 0 is undefined
+d <- 0.3  ## when d approaches 0, no depensation; d = 0 is undefined
 sdrec <- 0  ## when sdrec = 0, turns off stochasticity in recruitment
 rho <- 0.43 ## when rho = 0, there is no autocorrelation in the recruitment residuals
 ## default to 0.43, because the "switch" we're interested in is stochasticity vs determinism, not the degree of autocorrelation
 beta <- 1   ## when beta = 1, relationship between abundance and CPUE is linear
-int <- 0.45 # the y-intercept represents the probability of fishing when catch is zero; min intercept in our dataset is 0.01, max is 0.45
-stp <- 5  # the steepness of the logistic curve indicates how rapidly the probability of fishing increases as catch rates increase; evaluate at two orders of magnitude, 0.5 and 5
+int <- 0.42 # the y-intercept represents the probability of fishing when catch is zero; min intercept in our dataset is 0.01, max is 0.45
+# Use values 0.02 and 0.42 to get as close as possible to empirical values used in the previous versions of the analysis
+stp <- 3.5  # the steepness of the logistic curve indicates how rapidly the probability of fishing increases as catch rates increase; use 0.875 and 3.5 to replicate the steepnesses of the rag_prize (low intercept, low steepness) and kur_bottom (high intercept, high steepness) functions
 
 param_vec <- c(d, sdrec, rho, beta, int, stp)
 
