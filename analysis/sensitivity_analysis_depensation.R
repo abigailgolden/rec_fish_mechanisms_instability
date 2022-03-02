@@ -17,10 +17,10 @@ Bmsy <- 0.00001474532
 
 # Run sensitivity analysis along observed range of depensation parameter d --------------------------------------------
 
-dep_li_ls <- simulate_along(par_range = dep_range, params = c(0.001, 0, 0.430, 1.000, 0.01, 1), par_id = 1, Emax = 48, Bmsy = 0.00001437875, msy = 0.3998861)
-dep_li_hs <- simulate_along(par_range = dep_range, params = c(0.001, 0, 0.430, 1.000, 0.01, 10), par_id = 1, Emax = 48, Bmsy = 0.00001407869)
-dep_hi_ls <- simulate_along(par_range = dep_range, params = c(0.001, 0, 0.430, 1.000, 0.45, 1), par_id = 1, Emax = 48, Bmsy = 0.00001436646)
-dep_hi_hs <- simulate_along(par_range = dep_range, params = c(0.001, 0, 0.430, 1.000, 0.45, 10), par_id = 1, Emax = 48)
+dep_li_ls <- simulate_along(par_range = dep_range, params = c(0.001, 0, 0.430, 1.000, 0.02, 0.875), par_id = 1, Emax = 48, Bmsy = 0.00001437875, msy = 0.3998861)
+dep_li_hs <- simulate_along(par_range = dep_range, params = c(0.001, 0, 0.430, 1.000, 0.02, 3.5), par_id = 1, Emax = 48, Bmsy = 0.00001407869)
+dep_hi_ls <- simulate_along(par_range = dep_range, params = c(0.001, 0, 0.430, 1.000, 0.42, 0.875), par_id = 1, Emax = 48, Bmsy = 0.00001436646)
+dep_hi_hs <- simulate_along(par_range = dep_range, params = c(0.001, 0, 0.430, 1.000, 0.42, 3.5), par_id = 1, Emax = 48)
 
 
 scaled_dat_li_ls <- scale_output(dat = dep_li_ls, ref_param_val = 0.001)
@@ -28,7 +28,11 @@ scaled_dat_li_hs <- scale_output(dat = dep_li_hs, ref_param_val = 0.001)
 scaled_dat_hi_ls <- scale_output(dat = dep_hi_ls, ref_param_val = 0.001)
 scaled_dat_hi_hs <- scale_output(dat = dep_hi_hs, ref_param_val = 0.001)
 
-dat_all <- rbind(scaled_dat_li_ls, scaled_dat_li_hs, scaled_dat_hi_ls, scaled_dat_hi_hs)
+dat_all <- rbind(
+  scaled_dat_li_ls, 
+  scaled_dat_li_hs, 
+  scaled_dat_hi_ls, 
+  scaled_dat_hi_hs)
 dat_range <- dat_all %>% 
   group_by(type) %>% 
   summarize(min_val = min(val),
