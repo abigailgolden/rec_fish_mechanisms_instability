@@ -54,6 +54,7 @@ beta <- 1   ## when beta = 1, relationship between abundance and CPUE is linear
 int <- 0.42 # the y-intercept represents the probability of fishing when catch is zero; min intercept in our dataset is 0.01, max is 0.45
 # Use values 0.02 and 0.42 to get as close as possible to empirical values used in the previous versions of the analysis
 stp <- 3.5  # the steepness of the logistic curve indicates how rapidly the probability of fishing increases as catch rates increase; use 0.875 and 3.5 to replicate the steepnesses of the rag_prize (low intercept, low steepness) and kur_bottom (high intercept, high steepness) functions
+# to replicate the extremes of the empirical dataset, range from steepness = 0.1 (replicates Raguragavan et al. butterfish) to steepness = 270 (replicates Whitehead et al. billfish)
 
 param_vec <- c(d, sdrec, rho, beta, int, stp)
 
