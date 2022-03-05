@@ -62,3 +62,18 @@ plot(Ct, effort_lowest_s, type = "l", #xaxt = "n", yaxt = "n",
      xlab = "Past catch rates", ylab = "Current effort",
      xlim = c(0, 100), ylim = c(0,48))
 
+# what about a negative intercept?
+
+Ct <- seq(-100,100,by = 0.1)
+
+prob_neg <- logistic(-0.01, 0.5, Ct)
+effort_neg <- prob_neg*Emax
+
+neg_df <- data.frame(catch = Ct, prob = prob_neg, effort = effort_neg)
+
+plot(Ct, prob_neg, type = "l", #xaxt = "n", yaxt = "n", 
+     xlab = "Past catch rates", ylab = "Current effort" #,
+     # xlim = c(0, 100), ylim = c(0,48)
+     )
+
+# this gets weird, ask coauthors

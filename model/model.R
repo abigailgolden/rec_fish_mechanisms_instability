@@ -31,7 +31,7 @@ age <- 1:10   # number of ages
 t <- 200      # number of yearly time steps
 Linf <- 1     # von Bertalanffy L_infinity
 K <- 0.6      # von Bertalanffy K
-i <- 1*10^(-5) # length-weight slope parameter
+i_lw <- 1*10^(-5) # length-weight slope parameter
 m <- 3        # length-weight shape parameter
 sa <- 0.9    # survivorship
 amat <- 2    # age at maturity
@@ -46,7 +46,7 @@ c50 <- 0.1 # scaling parameter for catch
 
 # Parameters of interest --------------------------------------------------
 
-d <- 0.3  ## when d approaches 0, no depensation; d = 0 is undefined
+d <- 0.001  ## when d approaches 0, no depensation; d = 0 is undefined
 sdrec <- 0  ## when sdrec = 0, turns off stochasticity in recruitment
 rho <- 0.43 ## when rho = 0, there is no autocorrelation in the recruitment residuals
 ## default to 0.43, because the "switch" we're interested in is stochasticity vs determinism, not the degree of autocorrelation
@@ -63,7 +63,7 @@ param_vec <- c(d, sdrec, rho, beta, int, stp)
 
 # length and weight at age
 length_at_age <- Linf*(1-exp(-K*age))
-weight_at_age <- i*length_at_age^m
+weight_at_age <- i_lw*length_at_age^m
 
 # starting amount of depensation
 d0 <- 1 - exp(log(0.5)/d)  
@@ -102,8 +102,8 @@ nsims <- 100
 # 6. msy: maximum sustained yield
 # 7. ts: a true/false argument indicating either to return outcome variables (if FALSE) or turn time series of biomass, effort, etc. (if TRUE)
 
-params <- param_vec
-Emax <- 48
+# params <- param_vec
+# Emax <- 48
  
 simulate <- function(params, nsims, Emax, Bmsy = Bmsy, msy = msy, ts = FALSE){
   

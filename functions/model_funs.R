@@ -103,7 +103,7 @@ extirpation <- function(final_rec){
 cv_effort <- function(effort){
   effort_sd <- apply(effort, c(2), sd)
   effort_mean <- apply(effort, c(2), mean)
-  effort_cv <- effort_sd/effort_mean
+  effort_cv <- ifelse(effort_mean == 0, 0, effort_sd/effort_mean)
   return(effort_cv)
 }
 
