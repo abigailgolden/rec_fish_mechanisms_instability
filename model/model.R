@@ -190,15 +190,15 @@ for (y in 1:t){
   outvars <- data.frame(matrix(nrow = nsims, ncol = 0))
 
 ## calculate coefficient of variation of effort
-outvars$cv_effort <- cv_effort(effort = Et)
+outvars$cv_effort <- cv_effort(effort = Et[101:200,])
 
 ## calculate coefficient of variation of biomass
-outvars$cv_biomass <- cv_biomass(bt = Bt)
+outvars$cv_biomass <- cv_biomass(bt = Bt[101:200,])
 
 
 ## calculate cumulative catch and effort relative to Emax and catch in median scenario
-outvars$cumulative_effort <- cumul_effort(et = Et, Emax = Emax)
-outvars$cumulative_catch <- cumul_catch(ct = Ct)
+outvars$cumulative_effort <- cumul_effort(et = Et[101:200,], Emax = Emax)
+outvars$cumulative_catch <- cumul_catch(ct = Ct[101:200,])
 
 ## calculate proportion of simulations resulting in final recruitment = 0
 outvars$prop_extirpated <- extirpation(final_rec = N_at_age[200,1,])

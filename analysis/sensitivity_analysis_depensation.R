@@ -46,7 +46,7 @@ dat_range <- dat_all %>%
 
 dep_li_ls_plot <- outvar_heatmap(dat = scaled_dat_li_ls, 
                                    ref = 0.001,
-                                   title = "A) Low intercept, low steepness",
+                                   title = "C) Low intercept, low steepness",
                                    dat_range = dat_range,
                                    emp_dat= emp_dep,
                                    xlab =NULL, ylabelling = TRUE)
@@ -54,7 +54,7 @@ dep_li_ls_plot <- outvar_heatmap(dat = scaled_dat_li_ls,
 
 dep_li_hs_plot <- outvar_heatmap(dat = scaled_dat_li_hs, 
                                       ref = 0.001,
-                                      title = "B) Low intercept, high steepness",
+                                      title = "D) Low intercept, high steepness",
                                       dat_range = dat_range,
                                       emp_dat= emp_dep,
                                       xlab = NULL,
@@ -62,14 +62,14 @@ dep_li_hs_plot <- outvar_heatmap(dat = scaled_dat_li_hs,
 
 dep_hi_ls_plot <- outvar_heatmap(dat = scaled_dat_hi_ls, 
                                      ref = 0.001,
-                                     title = "C) High intercept, low steepness",
+                                     title = "A) High intercept, low steepness",
                                      dat_range = dat_range,
                                      emp_dat= emp_dep,
                                      xlab = "Depensation parameter d")
 
 dep_hi_hs_plot <- outvar_heatmap(dat = scaled_dat_hi_hs, 
                                   ref = 0.001,
-                                  title = "D) High intercept, high steepness",
+                                  title = "B) High intercept, high steepness",
                                   dat_range = dat_range,
                                   emp_dat= emp_dep,
                                   xlab = "Depensation parameter d",
