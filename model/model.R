@@ -51,12 +51,9 @@ sdrec <- 0  ## when sdrec = 0, turns off stochasticity in recruitment
 rho <- 0.43 ## when rho = 0, there is no autocorrelation in the recruitment residuals
 ## default to 0.43, because the "switch" we're interested in is stochasticity vs determinism, not the degree of autocorrelation
 beta <- 1   ## when beta = 1, relationship between abundance and CPUE is linear
-int <- 0.42 # the y-intercept represents the probability of fishing when catch is zero; min intercept in our dataset is 0.01, max is 0.45
-# Use values 0.02 and 0.42 to get as close as possible to empirical values used in the previous versions of the analysis
-stp <- 3.5  # the steepness of the logistic curve indicates how rapidly the probability of fishing increases as catch rates increase; use 0.875 and 3.5 to replicate the steepnesses of the rag_prize (low intercept, low steepness) and kur_bottom (high intercept, high steepness) functions
-# to replicate the extremes of the empirical dataset, range from steepness = 0.1 (replicates Raguragavan et al. butterfish) to steepness = 270 (replicates Whitehead et al. billfish)
 
-param_vec <- c(d, sdrec, rho, beta, int, stp)
+
+param_vec <- c(d, sdrec, rho, beta)
 
 
 # Calculated parameters -------------------------------------------------
@@ -105,14 +102,13 @@ nsims <- 100
 # params <- param_vec
 # Emax <- 48
  
-simulate <- function(params, nsims, Emax, Bmsy = Bmsy, msy = msy, ts = FALSE){
+simulate <- function(params, nsims, utilfun, Emax, Bmsy = Bmsy, msy = msy, ts = FALSE){
   
   d <- params[1]
   sdrec <- params[2]
   rho <- params[3]
   beta <- params[4]
-  intercept <- params[5]
-  steepness <- params[6]
+
 
   # create empty matrices to hold calculations of abundance, biomass, depensation, etc.
 
@@ -156,7 +152,7 @@ for (y in 1:t){
     if(y >= 2){
       
       
-      Pf[y,] <- logistic(c = intercept, a = steepness, x = Ct[y-1,]/c50)
+      Pf[y,] <- do.call(utilfun, args = list(x = Ct[y-1,], c50 = c50))
       Et[y,] <- Emax*Pf[y,]
       f[y,] <- qfish*Et[y,]
       Ct[y,] <- catch(n = N_at_age[y-1,,], Mf = f[y,])

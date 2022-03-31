@@ -10,7 +10,7 @@ effort_params <- data.frame(citation = NA,
                             lambda =  NA,
                             intercept = NA)
 
-c50 <- 0.01  # scaling parameter for catch
+c50 <- 0.1  # scaling parameter for catch
 
 # Raguragavan et al. 2013 --------------------------------------------
 

@@ -61,17 +61,6 @@ catch <- function(n, Mf){
   Mf*v
 }
 
-# logistic angler effort function with varying intercept and steepness
-# c = intercept
-# a = steepness
-
-
-logistic <- function(c, a, x){
-  y <- (c*exp(a*x))/(c*exp(a*x) + (1-c))
-  y2 <- ifelse(y == "NaN", 1, y)
-  return(y2)
-}
-
 # Functions to calculate outcome variables ---------------------------------
 
 # calculate number of years in which the stock is overfished (Bt < 0.5*Bmsy)

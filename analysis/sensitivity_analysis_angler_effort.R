@@ -11,9 +11,11 @@ param_names <- c("d", "sd", "rho", "beta")
 outfig <- here::here("figures")
 
 
+
 # Save model runs using each angler effort function ----------------------------------
 
 Emax <- 48
+c50 <- 0.1
 
 outlist <- list()
 

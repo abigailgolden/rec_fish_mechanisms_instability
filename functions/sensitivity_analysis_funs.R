@@ -19,9 +19,7 @@ simulate_along <- function(par_range, params, par_id, Emax, Bmsy, msy){
       pivot_longer(cols = 1:6, names_to = "varname", 
                    values_to = "val") %>% 
       mutate(param_name = param_names[par_id],
-             param_val = range[i],
-             int = parameters[5],
-             stp = parameters[6])
+             param_val = range[i])
     outlist[[i]] <- dat2
     setTxtProgressBar(progress_bar, value = i)
   }
@@ -123,29 +121,5 @@ outvar_heatmap <- function(dat, title = dat$cr_fun, dat_range, emp_dat, xlab, re
          x = xlab,
          y = NULL)+
     theme_classic()
-}
-
-
-# function to simulate along a range of steepnesses and intercepts of the angler effort relationship
-
-
-simulate_along_effort <- function(effort_mat, params, Emax, Bmsy, msy){
-  parameters <- params
-  outlist <- list()
-  progress_bar = txtProgressBar(min=0, max=nrow(effort_mat), style = 1, char="=")
-  for (i in 1:nrow(effort_mat)){
-    parameters[5] <- as.numeric(effort_mat[i,1])
-    parameters[6] <- as.numeric(effort_mat[i,2])
-    dat <- simulate(params = parameters, nsims = nsims, Emax = Emax, Bmsy = Bmsy)
-    dat2 <- summarise_all(dat, mean) %>% 
-      pivot_longer(cols = 1:6, names_to = "varname", 
-                   values_to = "val") %>% 
-      mutate(int = parameters[5],
-             stp = parameters[6])
-    outlist[[i]] <- dat2
-    setTxtProgressBar(progress_bar, value = i)
-  }
-  close(progress_bar)
-  outdat <- do.call(rbind, outlist)
 }
 
