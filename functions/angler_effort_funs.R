@@ -2,13 +2,13 @@
 # Full citations are included at the bottom of this script
 
 library(tidyverse)
+dir<- here::here("sim_data")
 
 # set up dataframe to output the y-intercept (probability of fishing when catch is zero; equation 13 in manuscript) for each study and species
 # then, calculate a steepness metric based on the difference between CPUE that produces p(fishing) = 0.6 and p(fishing) = 0.5 in a separate script, and import it to add to the dataframe
 
 effort_params <- data.frame(citation = NA,
                             species =  NA,
-                            lambda =  NA,
                             intercept = NA)
 
 # Raguragavan et al. 2013 --------------------------------------------
@@ -245,16 +245,16 @@ effort_params[11,] <- c("Mkwara et al. 2015",
 
 Pi_whi_billfish <- function(x, c50){
   Pi <- c()
+  billfish <- 0.02
+  cmp <- 2
+  mackerel <- 1
+  sg <- 1
+  other <- 4
+  iv <- 0.84
   for(i in 1:length(x)){
   if((x[i]/billfish) > 22){
     Pi[i] <- 1
   }else{
-    billfish <- 0.02
-    cmp <- 2
-    mackerel <- 1
-    sg <- 1
-    other <- 4
-    iv <- 0.84
     vi_han <- -0.012*630 +26.798*(x[i]/billfish) + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other + 2.06*1
     vbar_han <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other + 2.06*1
     v_roanoke <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other
@@ -379,7 +379,7 @@ funlist <- list(rag_prize = Pi_rag_prize,
                 whi_sg = Pi_whi_sg,
                 whi_other = Pi_whi_other)
 
-# add study location to the dataframe of summary parameters
+# add study location and steepness to the dataframe of summary parameters
 
 locations <- data.frame(citation = unique(effort_params$citation),
                         loc = c("Australia", 
@@ -388,12 +388,12 @@ locations <- data.frame(citation = unique(effort_params$citation),
                                 "New Zealand",
                                 "North Carolina"))
 
+lambdas <- read.csv(paste(dir, "lambdas.csv", sep = "/"), header = TRUE)
+
 df <- effort_params %>%
   left_join(locations, by = "citation") %>%
-  mutate(y = 0,
-         lambda = as.numeric(lambda),
-         log_lambda = log(lambda),
-         intercept = as.numeric(intercept),
+  left_join(lambdas, by = c("citation", "species")) %>% 
+  mutate(intercept = as.numeric(intercept),
          labs = paste(loc, species, sep = "\n"))
 
 # References
