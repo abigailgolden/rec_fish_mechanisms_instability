@@ -3,20 +3,19 @@
 
 library(tidyverse)
 
-# set up dataframe to output the parameters lambda (anglers' responsiveness to catch; equation 9 in manuscript) and y-intercept (probability of fishing when catch is zero; equation 13 in manuscript) for each study and species
+# set up dataframe to output the y-intercept (probability of fishing when catch is zero; equation 13 in manuscript) for each study and species
+# then, calculate a steepness metric based on the difference between CPUE that produces p(fishing) = 0.6 and p(fishing) = 0.5 in a separate script, and import it to add to the dataframe
 
 effort_params <- data.frame(citation = NA,
                             species =  NA,
                             lambda =  NA,
                             intercept = NA)
 
-c50 <- 0.1  # scaling parameter for catch
-
 # Raguragavan et al. 2013 --------------------------------------------
 
 # prize fish
 
-Pi_rag_prize <- function(x, c50){
+Pi_rag_prize <- function(x){
   S <- 48
   prize <- 1.28
   reef <- 1.47
@@ -24,19 +23,18 @@ Pi_rag_prize <- function(x, c50){
   table <- 1.97
   butter <- 8.86
   Vbar <- 0.003*1104.33 + -0.001*141.81 + 0.09*prize + 0.01*reef + 0.05*key + 0.03*table + 0.01*butter + 0.001*reef*0.24
-  Vi <- 0.003*1104.33 + -0.001*141.81 + 0.09*(x/c50) + 0.01*reef + 0.05*key + 0.03*table + 0.01*butter + 0.001*reef*0.24
+  Vi <- 0.003*1104.33 + -0.001*141.81 + 0.09*(x/prize) + 0.01*reef + 0.05*key + 0.03*table + 0.01*butter + 0.001*reef*0.24
   Pi <- exp(Vi)/(exp(Vi) + (S-1)*exp(Vbar))
   return(Pi)
 }
 
 effort_params[1,] <- c("Raguragavan et al. 2013", 
                        "prize fish",
-                       0.09*Pi_rag_prize(x = 0.001, c50 = c50)*(1-Pi_rag_prize(x = 0.001, c50 = c50)),
-                       Pi_rag_prize(x = 0, c50 = c50))
+                       Pi_rag_prize(x = 0))
 
 # reef fish
 
-Pi_rag_reef <- function(x, c50){
+Pi_rag_reef <- function(x){
   S <- 48
   prize <- 1.28
   reef <- 1.47
@@ -44,7 +42,7 @@ Pi_rag_reef <- function(x, c50){
   table <- 1.97
   butter <- 8.86
   Vbar <- 0.003*1104.33 + -0.001*141.81 + 0.09*prize + 0.01*reef + 0.05*key + 0.03*table + 0.01*butter + 0.001*reef*0.24
-  Vi <- 0.003*1104.33 + -0.001*141.81 + 0.09*prize + 0.01*(x/c50) + 0.05*key + 0.03*table + 0.01*butter + 0.001*(x/c50)*0.24
+  Vi <- 0.003*1104.33 + -0.001*141.81 + 0.09*prize + 0.01*(x/reef) + 0.05*key + 0.03*table + 0.01*butter + 0.001*(x/reef)*0.24
   Pi <- exp(Vi)/(exp(Vi) + (S-1)*exp(Vbar))
   return(Pi)
 }
@@ -52,12 +50,11 @@ Pi_rag_reef <- function(x, c50){
 
 effort_params[2,] <- c("Raguragavan et al. 2013", 
                        "reef fish", 
-                       0.01*Pi_rag_reef(x = 0.001, c50 = c50)*(1-Pi_rag_reef(x = 0.001, c50 = c50)), 
-                       Pi_rag_reef(x = 0, c50 = c50))
+                       Pi_rag_reef(x = 0))
 
 # key sports fish
 
-Pi_rag_key <- function(x, c50){
+Pi_rag_key <- function(x){
   S <- 48
   prize <- 1.28
   reef <- 1.47
@@ -65,19 +62,18 @@ Pi_rag_key <- function(x, c50){
   table <- 1.97
   butter <- 8.86
   Vbar <- 0.003*1104.33 + -0.001*141.81 + 0.09*prize + 0.01*reef + 0.05*key + 0.03*table + 0.01*butter + 0.001*reef*0.24
-  Vi <- 0.003*1104.33 + -0.001*141.81 + 0.09*prize + 0.01*reef + 0.05*(x/c50) + 0.03*table + 0.01*butter + 0.001*reef*0.24
+  Vi <- 0.003*1104.33 + -0.001*141.81 + 0.09*prize + 0.01*reef + 0.05*(x/key) + 0.03*table + 0.01*butter + 0.001*reef*0.24
   Pi <- exp(Vi)/(exp(Vi) + (S-1)*exp(Vbar))
   return(Pi)
 }
 
 effort_params[3,] <- c("Raguragavan et al. 2013", 
                        "key sports fish", 
-                       0.05*Pi_rag_key(x = 0.001, c50 = c50)*(1-Pi_rag_key(x = 0.001, c50 = c50)), 
-                       Pi_rag_key(x = 0, c50 = c50))
+                      Pi_rag_key(x = 0))
 
 # table fish
 
-Pi_rag_table <- function(x, c50){
+Pi_rag_table <- function(x){
   S <- 48
   prize <- 1.28
   reef <- 1.47
@@ -85,18 +81,18 @@ Pi_rag_table <- function(x, c50){
   table <- 1.97
   butter <- 8.86
   Vbar <- 0.003*1104.33 + -0.001*141.81 + 0.09*prize + 0.01*reef + 0.05*key + 0.03*table + 0.01*butter + 0.001*reef*0.24
-  Vi <- 0.003*1104.33 + -0.001*141.81 + 0.09*prize + 0.01*reef + 0.05*key + 0.03*(x/c50) + 0.01*butter + 0.001*reef*0.24
+  Vi <- 0.003*1104.33 + -0.001*141.81 + 0.09*prize + 0.01*reef + 0.05*key + 0.03*(x/table) + 0.01*butter + 0.001*reef*0.24
   Pi <- exp(Vi)/(exp(Vi) + (S-1)*exp(Vbar))
   return(Pi)
 }
 
 effort_params[4,] <- c("Raguragavan et al. 2013", 
-                       "table fish", 0.03*Pi_rag_table(x = 0.001, c50 = c50)*(1-Pi_rag_table(x = 0.001, c50 = c50)), 
-                       Pi_rag_table(x = 0, c50 = c50))
+                       "table fish",
+                       Pi_rag_table(x = 0))
 
 # butter fish
 
-Pi_rag_butter <- function(x, c50){
+Pi_rag_butter <- function(x){
   S <- 48
   prize <- 1.28
   reef <- 1.47
@@ -104,19 +100,18 @@ Pi_rag_butter <- function(x, c50){
   table <- 1.97
   butter <- 8.86
   Vbar <- 0.003*1104.33 + -0.001*141.81 + 0.09*prize + 0.01*reef + 0.05*key + 0.03*table + 0.01*butter + 0.001*reef*0.24
-  Vi <- 0.003*1104.33 + -0.001*141.81 + 0.09*prize + 0.01*reef + 0.05*key + 0.03*table + 0.01*(x/c50) + 0.001*reef*0.24
+  Vi <- 0.003*1104.33 + -0.001*141.81 + 0.09*prize + 0.01*reef + 0.05*key + 0.03*table + 0.01*(x/butter) + 0.001*reef*0.24
   Pi <- exp(Vi)/(exp(Vi) + (S-1)*exp(Vbar))
   return(Pi)
 }
 
 effort_params[5,] <- c("Raguragavan et al. 2013", 
-                       "butter fish",  
-                       0.01*Pi_rag_butter(x = 0.001, c50 = c50)*(1-Pi_rag_butter(x = 0.001, c50 = c50)), 
-                       Pi_rag_butter(x = 0, c50 = c50))
+                       "butter fish",
+                       Pi_rag_butter(x = 0))
 
 # Kuriyama et al. 2013 ------------------------------------------------
 
-Pi_kur_bottom <- function(x, c50){
+Pi_kur_bottom <- function(x){
   S <- 37
   bottomfish <- 0.3931
   coastal <- 1.9405
@@ -124,20 +119,19 @@ Pi_kur_bottom <- function(x, c50){
   inshore <- 1.5734
   notarget <- 0.2108
   Vbar <- -2.4853*0.6851 + 0.6436*0.4453 + -0.3706*0.4574 + 0.3532*bottomfish + 0.0986*coastal + 0.0506*hms + 0.0231*inshore + -1.632*notarget 
-  Vi <- 2.4853*0.6851 + 0.6436*0.4453 + -0.3706*0.4574 + 0.3532*(x/c50) + 0.0986*coastal + 0.0506*hms + 0.0231*inshore + -1.632*notarget 
+  Vi <- 2.4853*0.6851 + 0.6436*0.4453 + -0.3706*0.4574 + 0.3532*(x/bottomfish) + 0.0986*coastal + 0.0506*hms + 0.0231*inshore + -1.632*notarget 
   Pi <- exp(Vi)/(exp(Vi) + (S-1)*exp(Vbar))
   return(Pi)
 }
 
 
 effort_params[6,] <- c("Kuriyama et al. 2013", 
-                       "bottomfish",  
-                       0.3532*Pi_kur_bottom(x = 0.001, c50 = c50)*(1-Pi_kur_bottom(x = 0.001, c50 = c50)), 
-                       Pi_kur_bottom(x = 0, c50 = c50))
+                       "bottomfish",
+                       Pi_kur_bottom(x = 0))
 
 # coastal migratory species
 
-Pi_kur_coastal <- function(x, c50){
+Pi_kur_coastal <- function(x){
   S <- 37
   bottomfish <- 0.3931
   coastal <- 1.9405
@@ -145,20 +139,19 @@ Pi_kur_coastal <- function(x, c50){
   inshore <- 1.5734
   notarget <- 0.2108
   Vbar <- -2.4853*0.6851 + 0.6436*0.4453 + -0.3706*0.4574 + 0.3532*bottomfish + 0.0986*coastal + 0.0506*hms + 0.0231*inshore + -1.632*notarget 
-  Vi <- 2.4853*0.6851 + 0.6436*0.4453 + -0.3706*0.4574 + 0.3532*bottomfish + 0.0986*(x/c50) + 0.0506*hms + 0.0231*inshore + -1.632*notarget 
+  Vi <- 2.4853*0.6851 + 0.6436*0.4453 + -0.3706*0.4574 + 0.3532*bottomfish + 0.0986*(x/coastal) + 0.0506*hms + 0.0231*inshore + -1.632*notarget 
   Pi <- exp(Vi)/(exp(Vi) + (S-1)*exp(Vbar))
   return(Pi)
 }
 
 effort_params[7,] <- c("Kuriyama et al. 2013", 
                        "coastal migratory species",  
-                       0.0986*Pi_kur_coastal(x = 0.001, c50 = c50)*(1-Pi_kur_coastal(x = 0.001, c50 = c50)), 
-                       Pi_kur_coastal(x = 0, c50 = c50))
+                         Pi_kur_coastal(x = 0))
 
 
 # highly migratory species
 
-Pi_kur_hms <- function(x, c50){
+Pi_kur_hms <- function(x){
   S <- 37
   bottomfish <- 0.3931
   coastal <- 1.9405
@@ -166,7 +159,7 @@ Pi_kur_hms <- function(x, c50){
   inshore <- 1.5734
   notarget <- 0.2108
   Vbar <- -2.4853*0.6851 + 0.6436*0.4453 + -0.3706*0.4574 + 0.3532*bottomfish + 0.0986*coastal + 0.0506*hms + 0.0231*inshore + -1.632*notarget 
-  Vi <- 2.4853*0.6851 + 0.6436*0.4453 + -0.3706*0.4574 + 0.3532*bottomfish + 0.0986*coastal + 0.0506*(x/c50) + 0.0231*inshore + -1.632*notarget 
+  Vi <- 2.4853*0.6851 + 0.6436*0.4453 + -0.3706*0.4574 + 0.3532*bottomfish + 0.0986*coastal + 0.0506*(x/hms) + 0.0231*inshore + -1.632*notarget 
   Pi <- exp(Vi)/(exp(Vi) + (S-1)*exp(Vbar))
   return(Pi)
 }
@@ -174,12 +167,11 @@ Pi_kur_hms <- function(x, c50){
 
 effort_params[8,] <- c("Kuriyama et al. 2013", 
                        "highly migratory species",
-                       0.0506*Pi_kur_hms(x = 0.001, c50 = c50)*(1-Pi_kur_hms(x = 0.001, c50 = c50)), 
-                       Pi_kur_hms(x = 0, c50 = c50))
+                       Pi_kur_hms(x = 0))
 
 # inshore
 
-Pi_kur_inshore <- function(x, c50){
+Pi_kur_inshore <- function(x){
   S <- 37
   bottomfish <- 0.3931
   coastal <- 1.9405
@@ -187,7 +179,7 @@ Pi_kur_inshore <- function(x, c50){
   inshore <- 1.5734
   notarget <- 0.2108
   Vbar <- -2.4853*0.6851 + 0.6436*0.4453 + -0.3706*0.4574 + 0.3532*bottomfish + 0.0986*coastal + 0.0506*hms + 0.0231*inshore + -1.632*notarget 
-  Vi <- 2.4853*0.6851 + 0.6436*0.4453 + -0.3706*0.4574 + 0.3532*bottomfish + 0.0986*coastal + 0.0506*hms + 0.0231*(x/c50) + -1.632*notarget 
+  Vi <- 2.4853*0.6851 + 0.6436*0.4453 + -0.3706*0.4574 + 0.3532*bottomfish + 0.0986*coastal + 0.0506*hms + 0.0231*(x/inshore) + -1.632*notarget 
   Pi <- exp(Vi)/(exp(Vi) + (S-1)*exp(Vbar))
   return(Pi)
 }
@@ -195,8 +187,7 @@ Pi_kur_inshore <- function(x, c50){
 
 effort_params[9,] <- c("Kuriyama et al. 2013", 
                        "inshore species", 
-                       0.0231*Pi_kur_inshore(x = 0.001, c50 = c50)*(1-Pi_kur_inshore(x = 0.001, c50 = c50)), 
-                       Pi_kur_inshore(x = 0, c50 = c50))
+                       Pi_kur_inshore(x = 0))
 
 
 
@@ -206,16 +197,16 @@ effort_params[9,] <- c("Kuriyama et al. 2013",
 Pi_gent <- function(x, c50){
   S <- 63
   distance <- 41.54
-  Vi <- 0.05242*(0.33*distance*2) + 0.67653*(x/c50) + -0.23226*((distance*2)/40) + 0.68125*log(63)
-  Vbar <- 0.05242*(0.33*distance*2) + 0.67653*0.19 + -0.23226*((distance*2)/40) + 0.68125*log(63)
+  KRATE <- 0.19  # catch and keep rate
+  Vi <- 0.05242*(0.33*distance*2) + 0.67653*(x/KRATE) + -0.23226*((distance*2)/40) + 0.68125*log(63)
+  Vbar <- 0.05242*(0.33*distance*2) + 0.67653*KRATE + -0.23226*((distance*2)/40) + 0.68125*log(63)
   Pi <- exp(Vi)/(exp(Vi) + (S-1)*exp(Vbar))
   return(Pi)
 }
 
 effort_params[10,] <- c("Gentner 2006", 
                         "striped bass",  
-                        0.67653*Pi_gent(x = 0.001, c50 = c50)*(1-Pi_gent(x = 0.001, c50 = c50)), 
-                        Pi_gent(x = 0, c50 = c50))
+                       Pi_gent(x = 0))
 
 
 # Mkwara et al. 2015 ------------------------------------------------------
@@ -236,16 +227,15 @@ Pi_mkwara <- function(x, c50){
   
   S <- 11
   Vbar <- -0.072*cost + 0.19*sd + 1.376*fweight + 3.407*log(lksize) + 0.356*fdv + -0.352*urban + 0.015*forest + -0.056*depth + -0.606*hwarning
-  Vi <- -0.072*cost + 0.19*sd + 1.376*(x/c50) + 3.407*log(lksize) + 0.356*fdv + -0.352*urban + 0.015*forest + -0.056*depth + -0.606*hwarning
+  Vi <- -0.072*cost + 0.19*sd + 1.376*(x/fweight) + 3.407*log(lksize) + 0.356*fdv + -0.352*urban + 0.015*forest + -0.056*depth + -0.606*hwarning
   Pi <- exp(Vi)/(exp(Vi) + (S-1)*exp(Vbar))
   return(Pi)
 }
 
 
 effort_params[11,] <- c("Mkwara et al. 2015", 
-                        "trout",  
-                        1.376*Pi_mkwara(x = 0.001, c50 = c50)*(1-Pi_mkwara(x = 0.001, c50 = c50)), 
-                        Pi_mkwara(x = 0, c50 = c50))
+                        "trout",
+                        Pi_mkwara(x = 0))
 
 # Whitehead et al. 2013 -----------------------------------------------
 
@@ -256,7 +246,7 @@ effort_params[11,] <- c("Mkwara et al. 2015",
 Pi_whi_billfish <- function(x, c50){
   Pi <- c()
   for(i in 1:length(x)){
-  if((x[i]/c50) > 22){
+  if((x[i]/billfish) > 22){
     Pi[i] <- 1
   }else{
     billfish <- 0.02
@@ -265,7 +255,7 @@ Pi_whi_billfish <- function(x, c50){
     sg <- 1
     other <- 4
     iv <- 0.84
-    vi_han <- -0.012*630 +26.798*(x[i]/c50) + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other + 2.06*1
+    vi_han <- -0.012*630 +26.798*(x[i]/billfish) + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other + 2.06*1
     vbar_han <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other + 2.06*1
     v_roanoke <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other
     v_central <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other + 1.501*1
@@ -280,8 +270,7 @@ Pi_whi_billfish <- function(x, c50){
 
 effort_params[12,] <- c("Whitehead et al. 2013", 
                         "billfish",  
-                        26.798*Pi_whi_billfish(x = 0.001, c50 = c50)*(1-Pi_whi_billfish(x = 0.001, c50 = c50)), 
-                        Pi_whi_billfish(x = 0, c50 = c50))
+                        Pi_whi_billfish(x = 0))
 
 Pi_whi_cmp <- function(x, c50){
   billfish <- 0.02
@@ -290,7 +279,7 @@ Pi_whi_cmp <- function(x, c50){
   sg <- 1
   other <- 4
   iv <- 0.84
-  vi_han <- -0.012*630 +26.798*billfish + 0.662*(x/c50) +0.47*mackerel + 1.117*sg + 0.048*other + 2.06*1
+  vi_han <- -0.012*630 +26.798*billfish + 0.662*(x/cmp) +0.47*mackerel + 1.117*sg + 0.048*other + 2.06*1
   vbar_han <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other + 2.06*1
   v_roanoke <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other
   v_central <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other + 1.501*1
@@ -302,8 +291,7 @@ Pi_whi_cmp <- function(x, c50){
 
 effort_params[13,] <- c("Whitehead et al. 2013", 
                         "coastal migratory pelagics",  
-                        0.662*Pi_whi_cmp(x = 0.001, c50 = c50)*(1-Pi_whi_cmp(x = 0.001, c50 = c50)), 
-                        Pi_whi_cmp(x = 0, c50 = c50))
+                        Pi_whi_cmp(x = 0))
 
 Pi_whi_mackerel <- function(x, c50){
   billfish <- 0.02
@@ -312,7 +300,7 @@ Pi_whi_mackerel <- function(x, c50){
   sg <- 1
   other <- 4
   iv <- 0.84
-  vi_han <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*(x/c50) + 1.117*sg + 0.048*other + 2.06*1
+  vi_han <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*(x/mackerel) + 1.117*sg + 0.048*other + 2.06*1
   vbar_han <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other + 2.06*1
   v_roanoke <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other
   v_central <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other + 1.501*1
@@ -325,8 +313,7 @@ Pi_whi_mackerel <- function(x, c50){
 
 effort_params[14,] <- c("Whitehead et al. 2013", 
                         "mackerel",  
-                        0.47*Pi_whi_mackerel(x = 0.001, c50 = c50)*(1-Pi_whi_mackerel(x = 0.001, c50 = c50)), 
-                        Pi_whi_mackerel(x = 0, c50 = c50))
+                        Pi_whi_mackerel(x = 0))
 
 
 Pi_whi_sg <- function(x, c50){
@@ -336,7 +323,7 @@ Pi_whi_sg <- function(x, c50){
   sg <- 1
   other <- 4
   iv <- 0.84
-  vi_han <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*(x/c50) + 0.048*other + 2.06*1
+  vi_han <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*(x/sg) + 0.048*other + 2.06*1
   vbar_han <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other + 2.06*1
   v_roanoke <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other
   v_central <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other + 1.501*1
@@ -347,18 +334,17 @@ Pi_whi_sg <- function(x, c50){
 }
 
 effort_params[15,] <- c("Whitehead et al. 2013", 
-                        "snapper-grouper",  
-                        1.117*Pi_whi_sg(x = 0.001, c50 = c50)*(1-Pi_whi_sg(x = 0.001, c50 = c50)), 
-                        Pi_whi_sg(x = 0, c50 = c50))
+                        "snapper-grouper",
+                        Pi_whi_sg(x = 0))
 
-Pi_whi_other <- function(x, c50){
+Pi_whi_other <- function(x){
   billfish <- 0.02
   cmp <- 2
   mackerel <- 1
   sg <- 1
   other <- 4
   iv <- 0.84
-  vi_han <- -0.012*630 + 26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*(x/c50) + 2.06*1
+  vi_han <- -0.012*630 + 26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*(x/other) + 2.06*1
   vbar_han <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other + 2.06*1
   v_roanoke <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other
   v_central <- -0.012*630 +26.798*billfish + 0.662*cmp +0.47*mackerel + 1.117*sg + 0.048*other + 1.501*1
@@ -370,8 +356,7 @@ Pi_whi_other <- function(x, c50){
 
 effort_params[16,] <- c("Whitehead et al. 2013", 
                         "other fish", 
-                        0.048*Pi_whi_other(x = 0.001, c50 = c50)*(1-Pi_whi_other(x = 0.001, c50 = c50)), 
-                        Pi_whi_other(x = 0, c50 = c50))
+                       Pi_whi_other(x = 0))
 
 # Function list -------------------------------------------------------
 
