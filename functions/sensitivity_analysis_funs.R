@@ -9,12 +9,12 @@ library(patchwork)
 
 simulate_along <- function(par_range, params, par_id, utilfun, Emax, Bmsy, msy, utilname){
   range <- par_range
-  parameters <- params
+  params <- param_vec
   outlist <- list()
   progress_bar = txtProgressBar(min=0, max=length(range), style = 1, char="=")
   for (i in 1:length(range)){
-    parameters[par_id] <- range[i]
-    dat <- simulate(params = parameters, nsims = nsims, Emax = Emax, Bmsy = Bmsy, utilfun = utilfun)
+    params[par_id] <- range[i]
+    dat <- simulate(params = params, nsims = nsims, Emax = Emax, Bmsy = Bmsy, utilfun = utilfun)
     dat2 <- summarise_all(dat, mean) %>% 
       pivot_longer(cols = 1:6, names_to = "varname", 
                    values_to = "val") %>% 
@@ -28,7 +28,7 @@ simulate_along <- function(par_range, params, par_id, utilfun, Emax, Bmsy, msy, 
   outdat <- do.call(rbind, outlist)
 }
 
-# function to scale the output relative to the value of a given outcome variable at the reference value
+# function to scale the output relative to the value of that outcome variable when the mechanism of interest is at the reference value
 
 scale_output <- function(dat, ref_param_val) {
   ref <- dat %>% 
@@ -38,7 +38,8 @@ scale_output <- function(dat, ref_param_val) {
   
   scaled_dat <- dat %>%
     left_join(ref, by = c("varname")) %>% 
-    mutate(pct_change = ifelse(ref_val != 0, ((val - ref_val)/ref_val*100), NA),
+    mutate(pct_change = ifelse(ref_val != 0, 
+                               ((val - ref_val)/ref_val*100), NA),
            varname = fct_relevel(varname, "cv_effort",
                                  "cv_biomass",
                                  "cumulative_effort",
@@ -53,18 +54,18 @@ scale_output <- function(dat, ref_param_val) {
 }
 
 # function to make heatmap of outcome variables
+
 outvar_heatmap <- function(dat, title = dat$cr_fun, dat_range, emp_dat, xlab, ref, ylabelling = TRUE){
   if(ylabelling == TRUE){
     labs <- c("CV of effort", 
               "CV of biomass",
-              "Cumulative effort",
-              "Cumulative catch",
-              "Proportion extirpated",
-              "Proportion of\nyears overfished")
+              "Cumul. effort",
+              "Cumul. catch",
+              "Prop. extirpated",
+              "Prop. years overfished")
   }else{
     labs <- NULL
   }
-  
   ggplot()+
     scale_y_discrete(limits = levels(dat$varname),
                      labels = labs)+
@@ -73,8 +74,7 @@ outvar_heatmap <- function(dat, title = dat$cr_fun, dat_range, emp_dat, xlab, re
                               varname == "prop_extirpated"),
               aes(x = param_val, 
                   y = varname, 
-                  fill = val)
-    )+
+                  fill = val))+
     scale_fill_distiller(type = "seq", palette = "Reds", direction = 1,
                          name = "Proportion",
                          limits = c(0,1),
@@ -86,10 +86,9 @@ outvar_heatmap <- function(dat, title = dat$cr_fun, dat_range, emp_dat, xlab, re
                               varname == "cumulative_effort"),
               aes(x = param_val, 
                   y = varname, 
-                  fill = pct_change)
-    )+
+                  fill = pct_change))+
     scale_fill_distiller(type = "div", palette = "PiYG", direction = 1,
-                         name = "% change in\ncumulative\nsocial benefits",
+                         name = "% change in\ncumul.\nsocial\nbenefits",
                          limits = c(-1*max(abs(dat_range[2,4:5])),
                                     max(abs(dat_range[2,4:5]))),
                          guide = guide_legend(order = 2),
@@ -99,8 +98,7 @@ outvar_heatmap <- function(dat, title = dat$cr_fun, dat_range, emp_dat, xlab, re
                             varname == "cv_effort" |
                               varname == "cv_biomass"),
               aes(x = param_val, y = varname, 
-                  fill = val)
-    )+
+                  fill = val))+
     scale_fill_distiller(type = "seq", palette = "BuPu", direction = 1,
                          name = "Coefficient\nof variation",
                          limits = c(0, ifelse(dat_range$max_val[3] < 2, 2, dat_range$max_val[3])),
@@ -119,4 +117,3 @@ outvar_heatmap <- function(dat, title = dat$cr_fun, dat_range, emp_dat, xlab, re
           legend.text = element_text(size = 13),
           legend.title = element_text(size = 15))
 }
-

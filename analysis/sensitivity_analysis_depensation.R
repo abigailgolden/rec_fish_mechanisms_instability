@@ -45,12 +45,28 @@ dat_range <- dat_all %>%
 
 # Visualize output --------------------------------------------------------
 
+dep_kur_coastal_plot <- outvar_heatmap(dat = scaled_dat_kur_coastal, 
+                                       ref = 0.001,
+                                       title = "A) High intercept, low steepness",
+                                       dat_range = dat_range,
+                                       emp_dat= emp_dep,
+                                       xlab = NULL)
+
+dep_kur_bottom_plot <- outvar_heatmap(dat = scaled_dat_kur_bottom, 
+                                      ref = 0.001,
+                                      title = "B) High intercept, high steepness",
+                                      dat_range = dat_range,
+                                      emp_dat= emp_dep,
+                                      xlab = NULL,
+                                      ylabelling = FALSE)
+
 dep_rag_prize_plot <- outvar_heatmap(dat = scaled_dat_rag_prize, 
                                    ref = 0.001,
                                    title = "C) Low intercept, low steepness",
                                    dat_range = dat_range,
                                    emp_dat= emp_dep,
-                                   xlab =NULL, ylabelling = TRUE)
+                                   xlab = "Depensation parameter d",
+                                   ylabelling = TRUE)
 
 
 dep_whi_sg_plot <- outvar_heatmap(dat = scaled_dat_whi_sg, 
@@ -58,25 +74,12 @@ dep_whi_sg_plot <- outvar_heatmap(dat = scaled_dat_whi_sg,
                                       title = "D) Low intercept, high steepness",
                                       dat_range = dat_range,
                                       emp_dat= emp_dep,
-                                      xlab = NULL,
+                                      xlab = "Depensation parameter d",
                                       ylabelling = FALSE)
 
-dep_kur_coastal_plot <- outvar_heatmap(dat = scaled_dat_kur_coastal, 
-                                     ref = 0.001,
-                                     title = "A) High intercept, low steepness",
-                                     dat_range = dat_range,
-                                     emp_dat= emp_dep,
-                                     xlab = "Depensation parameter d")
 
-dep_kur_bottom_plot <- outvar_heatmap(dat = scaled_dat_kur_bottom, 
-                                  ref = 0.001,
-                                  title = "B) High intercept, high steepness",
-                                  dat_range = dat_range,
-                                  emp_dat= emp_dep,
-                                  xlab = "Depensation parameter d",
-                                  ylabelling = FALSE)
 
-figname <- "figS1_depensation_sensitivity_analysis.png"
+figname <- paste(todaysdate, "figS1_depensation_sensitivity_analysis.png", sep = "-")
 png(paste(outfig, figname, sep = "/"), width = 12, height = 10, units = "in", res = 1000)
 
 (dep_kur_coastal_plot + dep_kur_bottom_plot) / (dep_rag_prize_plot + dep_whi_sg_plot) +plot_layout(guides = "collect")
