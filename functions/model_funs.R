@@ -92,7 +92,8 @@ extirpation <- function(final_rec){
 cv_effort <- function(effort){
   effort_sd <- apply(effort, c(2), sd)
   effort_mean <- apply(effort, c(2), mean)
-  effort_cv <- ifelse(effort_mean == 0, 0, effort_sd/effort_mean)
+  effort_cv <- effort_sd/effort_mean
+  effort_cv[is.na(effort_cv)] <- 0
   return(effort_cv)
 }
 
@@ -102,6 +103,7 @@ cv_biomass <- function(bt){
   biomass_sd <- apply(bt, c(2), sd)
   biomass_mean <- apply(bt, c(2), mean)
   biomass_cv <- biomass_sd/biomass_mean
+  biomass_cv[is.na(biomass_cv)] <- 0
   return(biomass_cv)
 }
 
