@@ -7,19 +7,20 @@ library(patchwork)
 
 # function to simulate along a range of parameter values
 
-simulate_along <- function(par_range, params, par_id, Emax, Bmsy, msy){
+simulate_along <- function(par_range, params, par_id, utilfun, Emax, Bmsy, msy, utilname){
   range <- par_range
   parameters <- params
   outlist <- list()
   progress_bar = txtProgressBar(min=0, max=length(range), style = 1, char="=")
   for (i in 1:length(range)){
     parameters[par_id] <- range[i]
-    dat <- simulate(params = parameters, nsims = nsims, Emax = Emax, Bmsy = Bmsy)
+    dat <- simulate(params = parameters, nsims = nsims, Emax = Emax, Bmsy = Bmsy, utilfun = utilfun)
     dat2 <- summarise_all(dat, mean) %>% 
       pivot_longer(cols = 1:6, names_to = "varname", 
                    values_to = "val") %>% 
       mutate(param_name = param_names[par_id],
-             param_val = range[i])
+             param_val = range[i],
+             cr_fun = utilname)
     outlist[[i]] <- dat2
     setTxtProgressBar(progress_bar, value = i)
   }
@@ -72,8 +73,7 @@ outvar_heatmap <- function(dat, title = dat$cr_fun, dat_range, emp_dat, xlab, re
                               varname == "prop_extirpated"),
               aes(x = param_val, 
                   y = varname, 
-                  fill = val),
-              #  width = 0.01, height = 1
+                  fill = val)
     )+
     scale_fill_distiller(type = "seq", palette = "Reds", direction = 1,
                          name = "Proportion",
@@ -86,8 +86,7 @@ outvar_heatmap <- function(dat, title = dat$cr_fun, dat_range, emp_dat, xlab, re
                               varname == "cumulative_effort"),
               aes(x = param_val, 
                   y = varname, 
-                  fill = pct_change),
-              # width = 0.01, height = 1
+                  fill = pct_change)
     )+
     scale_fill_distiller(type = "div", palette = "PiYG", direction = 1,
                          name = "% change in\ncumulative\nsocial benefits",
@@ -100,26 +99,24 @@ outvar_heatmap <- function(dat, title = dat$cr_fun, dat_range, emp_dat, xlab, re
                             varname == "cv_effort" |
                               varname == "cv_biomass"),
               aes(x = param_val, y = varname, 
-                  fill = val),
-              # width = 0.01, height = 1
+                  fill = val)
     )+
     scale_fill_distiller(type = "seq", palette = "BuPu", direction = 1,
                          name = "Coefficient\nof variation",
                          limits = c(0, ifelse(dat_range$max_val[3] < 2, 2, dat_range$max_val[3])),
                          guide = guide_legend(order = 3),
                          na.value = "white")+
-    # scale_fill_gradient2(low = "#9ecae1", mid = "white", high = "red",
-    #                      limits = c(0, 
-    #                                 ifelse(dat_range$max_val[3] < 2, 2, 
-    #                                        dat_range$max_val[3])), 
-    #                      midpoint = 1,
-    #                      name = "Coefficient\nof variation",
-    #                      guide = guide_legend(order = 3))+
+    geom_hline(yintercept = c(2.5,4.5), linetype = 1, size = 1.5, col = "white")+
     geom_vline(xintercept = emp_dat, linetype = 2)+
     geom_vline(xintercept = ref, linetype = 1, size = 1.2)+
     labs(title = title, 
          x = xlab,
          y = NULL)+
-    theme_classic()
+    theme_classic()+
+    theme(axis.text = element_text(size = 13),
+          axis.title = element_text(size = 15),
+          plot.title = element_text(size = 17),
+          legend.text = element_text(size = 13),
+          legend.title = element_text(size = 15))
 }
 
