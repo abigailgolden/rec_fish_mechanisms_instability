@@ -125,7 +125,7 @@ cve <- ggplot(data = mean_dat, aes(x = lambda, y = intercept))+
   geom_point(shape= 1, size = 4, color = "black")+
   scale_color_distiller(type = "seq", palette = "BuPu", direction = 1,
                        name = "Coefficient\nof variation",
-                       limits = c(0, max(mean_dat[,4:5], na.rm = TRUE)))+
+                       limits = c(0, 1))+
   scale_x_log10()+
   geom_hline(yintercept = median(mean_dat$intercept), linetype = 2)+
   geom_vline(xintercept = median(mean_dat$lambda), linetype = 2)+
@@ -144,7 +144,7 @@ cvb <- ggplot(data = mean_dat, aes(x = lambda, y = intercept))+
   geom_point(shape= 1, size = 4, color = "black")+
   scale_color_distiller(type = "seq", palette = "BuPu", direction = 1,
                        name = "Coefficient\nof variation",
-                       limits = c(0, max(mean_dat[,4:5], na.rm = TRUE)))+
+                       limits = c(0, 1))+
   geom_hline(yintercept = median(mean_dat$intercept), linetype = 2)+
   geom_vline(xintercept = median(mean_dat$lambda), linetype = 2)+
   labs(title = "F) Coefficient of variation of biomass", x = "Steepness of angler response to catch rates (\u03bb)", y = NULL)+

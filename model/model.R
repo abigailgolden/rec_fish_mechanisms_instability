@@ -151,7 +151,7 @@ for (y in 1:t){
     if(y >= 2){
       
       
-      Pf[y,] <- do.call(utilfun, args = list(x = Ct[y-1,]))
+      Pf[y,] <- do.call(utilfun, args = list(x = CPUE[y-1,]))
       Et[y,] <- Emax*Pf[y,]
       f[y,] <- qfish*Et[y,]
       Ct[y,] <- catch(n = N_at_age[y-1,,], Mf = f[y,])

@@ -41,77 +41,41 @@ Bmsy <- 0.00001437875   # Bmsy when effort is at equilibrium
 msy <- 0.3998861        # MSY when effort is at equilibrium
 
 
-# Null with whi_mackerel ------------------------------------------------------
-
-whi_null <- simulate(params = param_vec, nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_whi_mackerel)
-
-# define reference levels of cumulative catch and effort as the cumulative catch and effort when all parameters are at the null
-whi_ref_effort <- whi_null$cumulative_effort[1]
-whi_ref_catch <- whi_null$cumulative_catch[1]
-
-
-# Single params with whi_mackerel -----------------------------------------------------------
-
-whi_dep <- simulate(params = c(0.06, 0, 0, 1.000), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_whi_mackerel)
-
-whi_rec <- simulate(params = c(0.001, 0.74, 0.45, 1.000), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_whi_mackerel)
-
-whi_hyp <- simulate(params = c(0.001, 0, 0, 0.53), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_whi_mackerel)
-
-
-# Interactions with whi_mackerel------------------------------------------------------------
-
-whi_dep_rec <- simulate(params = c(0.06, 0.74, 0.45, 1.000), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_whi_mackerel)
-
-whi_dep_hyp <- simulate(params = c(0.06, 0, 0, 0.53), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_whi_mackerel)
-
-whi_rec_hyp <- simulate(params = c(0.001, 0.74, 0.45, 0.53), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_whi_mackerel)
-
-
-# Reshape outcome dataframes relative to the null using the Whitehead et al. mackerel angler effort function-----------------------------------------------------------------
-
-dfs <- c("whi_null", "whi_dep", "whi_rec", "whi_hyp", "whi_dep_rec", "whi_dep_hyp", "whi_rec_hyp")
-for (i in dfs){
-  assign(i, transform(get(i), 
-                      cumulative_catch = ((cumulative_catch - whi_ref_catch)/whi_ref_catch)*100,
-                      cumulative_effort = ((cumulative_effort - whi_ref_effort)/whi_ref_effort)*100))
-}
-
 
 # Null with kur_bottom ------------------------------------------------------
 
-kur_null <- simulate(params = param_vec, nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_bottom)
+kur_bottom_null <- simulate(params = param_vec, nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_bottom)
 
 # define reference levels of cumulative catch and effort as the cumulative catch and effort when all parameters are at the null
-kur_ref_effort <- kur_null$cumulative_effort[1]
-kur_ref_catch <- kur_null$cumulative_catch[1]
+kur_bottom_ref_effort <-kur_bottom_null$cumulative_effort[1]
+kur_bottom_ref_catch <- kur_bottom_null$cumulative_catch[1]
 
 
 # Single params with kur_bottom -----------------------------------------------------------
 
-kur_dep <- simulate(params = c(0.06, 0, 0, 1.000), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_bottom)
+kur_bottom_dep <- simulate(params = c(0.06, 0, 0, 1.000), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_bottom)
 
-kur_rec <- simulate(params = c(0.001, 0.74, 0.45, 1.000), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_bottom)
+kur_bottom_rec <- simulate(params = c(0.001, 0.74, 0.45, 1.000), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_bottom)
 
-kur_hyp <- simulate(params = c(0.001, 0, 0, 0.53), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_bottom)
+kur_bottom_hyp <- simulate(params = c(0.001, 0, 0, 0.53), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_bottom)
 
 
 # Interactions with kur_bottom------------------------------------------------------------
 
-kur_dep_rec <- simulate(params = c(0.06, 0.74, 0.45, 1.000), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_bottom)
+kur_bottom_dep_rec <- simulate(params = c(0.06, 0.74, 0.45, 1.000), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_bottom)
 
-kur_dep_hyp <- simulate(params = c(0.06, 0, 0, 0.53), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_bottom)
+kur_bottom_dep_hyp <- simulate(params = c(0.06, 0, 0, 0.53), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_bottom)
 
-kur_rec_hyp <- simulate(params = c(0.001, 0.74, 0.45, 0.53), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_bottom)
+kur_bottom_rec_hyp <- simulate(params = c(0.001, 0.74, 0.45, 0.53), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_bottom)
 
 
 # Reshape with kur_bottom-----------------------------------------------------------------
 
-dfs <- c("kur_null", "kur_dep", "kur_rec", "kur_hyp", "kur_dep_rec", "kur_dep_hyp", "kur_rec_hyp")
+dfs <- c("kur_bottom_null", "kur_bottom_dep", "kur_bottom_rec", "kur_bottom_hyp", "kur_bottom_dep_rec", "kur_bottom_dep_hyp", "kur_bottom_rec_hyp")
 for (i in dfs){
   assign(i, transform(get(i), 
-                      cumulative_catch = ((cumulative_catch - kur_ref_catch)/kur_ref_catch)*100,
-                      cumulative_effort = ((cumulative_effort - kur_ref_effort)/kur_ref_effort)*100))
+                      cumulative_catch = ((cumulative_catch - kur_bottom_ref_catch)/kur_bottom_ref_catch)*100,
+                      cumulative_effort = ((cumulative_effort - kur_bottom_ref_effort)/kur_bottom_ref_effort)*100))
 }
 
 
@@ -152,40 +116,40 @@ for (i in dfs){
                       cumulative_effort = ((cumulative_effort - rag_ref_effort)/rag_ref_effort)*100))
 }
 
-# Repeat this with kur_hms --------------------------------------------------
+# Repeat this with kur_coastal --------------------------------------------------
 
-kur_hms_null <- simulate(params = param_vec, nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_hms)
+kur_coastal_null <- simulate(params = param_vec, nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_coastal)
 
 # define reference levels of cumulative catch and effort as the cumulative catch and effort when all parameters are at the null
-kur_hms_ref_effort <- kur_hms_null$cumulative_effort[1]
-kur_hms_ref_catch <- kur_hms_null$cumulative_catch[1]
+kur_coastal_ref_effort <- kur_coastal_null$cumulative_effort[1]
+kur_coastal_ref_catch <- kur_coastal_null$cumulative_catch[1]
 
 
 # Single params with kur_hms -----------------------------------------------------------
 
-kur_hms_dep <- simulate(params = c(0.06, 0, 0, 1.000), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_hms)
+kur_coastal_dep <- simulate(params = c(0.06, 0, 0, 1.000), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_coastal)
 
-kur_hms_rec <- simulate(params = c(0.001, 0.74, 0.45, 1.000), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_hms)
+kur_coastal_rec <- simulate(params = c(0.001, 0.74, 0.45, 1.000), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_coastal)
 
-kur_hms_hyp <- simulate(params = c(0.001, 0, 0, 0.53), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_hms)
+kur_coastal_hyp <- simulate(params = c(0.001, 0, 0, 0.53), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_coastal)
 
 
 # Interactions with kur_hms------------------------------------------------------------
 
-kur_hms_dep_rec <- simulate(params = c(0.06, 0.74, 0.45, 1.000), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_hms)
+kur_coastal_dep_rec <- simulate(params = c(0.06, 0.74, 0.45, 1.000), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_coastal)
 
-kur_hms_dep_hyp <- simulate(params = c(0.06, 0, 0, 0.53), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_hms)
+kur_coastal_dep_hyp <- simulate(params = c(0.06, 0, 0, 0.53), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_coastal)
 
-kur_hms_rec_hyp <- simulate(params = c(0.001, 0.74, 0.45, 0.53), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_hms)
+kur_coastal_rec_hyp <- simulate(params = c(0.001, 0.74, 0.45, 0.53), nsims = nsims, Emax = Emax, Bmsy = Bmsy, msy = msy, utilfun = Pi_kur_coastal)
 
 
 # Reshape with kur_hms-----------------------------------------------------------------
 
-dfs <- c("kur_hms_null", "kur_hms_dep", "kur_hms_rec", "kur_hms_hyp", "kur_hms_dep_rec", "kur_hms_dep_hyp", "kur_hms_rec_hyp")
+dfs <- c("kur_coastal_null", "kur_coastal_dep", "kur_coastal_rec", "kur_coastal_hyp", "kur_coastal_dep_rec", "kur_coastal_dep_hyp", "kur_coastal_rec_hyp")
 for (i in dfs){
   assign(i, transform(get(i), 
-                      cumulative_catch = ((cumulative_catch - kur_hms_ref_catch)/kur_hms_ref_catch)*100,
-                      cumulative_effort = ((cumulative_effort - kur_hms_ref_effort)/kur_hms_ref_effort)*100))
+                      cumulative_catch = ((cumulative_catch - kur_coastal_ref_catch)/kur_coastal_ref_catch)*100,
+                      cumulative_effort = ((cumulative_effort - kur_coastal_ref_effort)/kur_coastal_ref_effort)*100))
 }
 
 
@@ -227,56 +191,48 @@ for (i in dfs){
 
 # Plot the four representative catch-effort functions ---------------------------------------------
 
-Ct <- seq(0,1, by = 0.01)
+Ct <- seq(0,4, by = 0.01)
 
-whi_prob <- Pi_whi_mackerel(x = Ct, c50 = c50)
-whi_effort <- whi_prob*Emax
+kur_bottom_prob <- Pi_kur_bottom(x = Ct)
+kur_bottom_effort <- kur_bottom_prob*Emax
 
-plot(Ct, whi_effort, type = "l", #xaxt = "n", yaxt = "n", 
-     xlab = "", ylab = "", ylim = c(0,48))
-title(xlab = "Past catch rates", ylab = "Current effort", cex.lab = 3)
-
-
-kur_prob <- Pi_kur_bottom(x = Ct, c50 = c50)
-kur_effort <- kur_prob*Emax
-
-plot(Ct, kur_effort, type = "l", #xaxt = "n", yaxt = "n", 
+plot(Ct, kur_bottom_effort, type = "l",
      xlab = "Past catch rates", ylab = "Current effort", ylim = c(0,48))
 
 
-rag_prob <- Pi_rag_prize(x = Ct, c50 = c50)
+rag_prob <- Pi_rag_prize(x = Ct)
 rag_effort <- rag_prob*Emax
 
-plot(Ct, rag_effort, type = "l", #xaxt = "n", yaxt = "n", 
+plot(Ct, rag_effort, type = "l",
      xlab = "Past catch rates", ylab = "Current effort", ylim = c(0,48))
 
-kur_hms_prob <- Pi_kur_hms(x = Ct, c50 = c50)
-kur_hms_effort <- kur_hms_prob*Emax
+kur_coastal_prob <- Pi_kur_coastal(x = Ct)
+kur_coastal_effort <- kur_coastal_prob*Emax
 
-plot(Ct, kur_hms_effort, type = "l", #xaxt = "n", yaxt = "n", 
+plot(Ct, kur_coastal_effort, type = "l",
      xlab = "Past catch rates", ylab = "Current effort", ylim = c(0,48))
 
-whi_sg_prob <- Pi_whi_sg(x = Ct, c50 = c50)
+whi_sg_prob <- Pi_whi_sg(x = Ct)
 whi_sg_effort <- whi_sg_prob*Emax
 
-plot(Ct, whi_sg_effort, type = "l", #xaxt = "n", yaxt = "n", 
+plot(Ct, whi_sg_effort, type = "l",
      xlab = "Past catch rates", ylab = "Current effort", ylim = c(0,48))
 
 
 # Plot interactions between depensation, hyperstability, and stochasticity at their median levels in the presence of four representative angler effort functions ------------------
 
 
-figname <- "fig5.png"
-png(paste(outfig, figname, sep = "/"), width = 17, height = 15, units = "in", res = 1000)
+figname <- paste(todaysdate,"fig5.png", sep = "-")
+png(paste(outfig, figname, sep = "/"), width = 22, height = 18, units = "in", res = 1000)
 
-par(mar = c(1, 2, 4, 1))
+par(mar = c(1, 2, 4, 2))
 
 par(mfrow = c(4,4))
 
 # row 1
-plot_radar_interaction(scenario1 = kur_hms_dep, 
-                       scenario2 = kur_hms_rec,
-                       int = kur_hms_dep_rec,
+plot_radar_interaction(scenario1 = kur_coastal_dep, 
+                       scenario2 = kur_coastal_rec,
+                       int = kur_coastal_dep_rec,
                        names = c("Median depensation",
                                  "Median stochasticity",
                                  "Median depensation and stochasticity"),
@@ -284,21 +240,21 @@ plot_radar_interaction(scenario1 = kur_hms_dep,
                        title = NULL,
                        legend = FALSE
 )
-mtext("A) High intercept, low steepness", side= 3, line = 2, font = 2, cex = 1.6)
-mtext("Recruitment stochasticity\nSD = 0.74, \u03c1 = 0.45", side = 2,font = 2, line = -2, cex = 1.2, col = col_key[2,1])
+mtext("A) High intercept, low steepness", side= 3, line = 2, font = 2, cex = 2)
+mtext("Recruitment stochasticity", side = 2,font = 2, line = -2, cex = 1.7, col = col_key[2,1])
 
 
-par(mar = c(3, 4, 2, 5))
+par(mar = c(3, 3, 2, 5))
 
-plot(Ct, kur_hms_effort, type = "l", xaxt = "n", yaxt = "n", 
-     xlab = "", ylab = "", ylim = c(0,48))
+plot(Ct, kur_coastal_effort, type = "l", xaxt = "n", yaxt = "n", 
+     xlab = "", ylab = "", ylim = c(0,48), lwd = 3)
 title(xlab = "Past catch rates", ylab = "Current effort", line = 1, cex.lab = 2)
 
-par(mar = c(1, 2, 4, 1))
+par(mar = c(1, 2, 4, 2))
 
-plot_radar_interaction(scenario1 = kur_dep, 
-                       scenario2 = kur_rec,
-                       int = kur_dep_rec,
+plot_radar_interaction(scenario1 = kur_bottom_dep, 
+                       scenario2 = kur_bottom_rec,
+                       int = kur_bottom_dep_rec,
                        names = c("Median depensation",
                                  "Median stochasticity",
                                  "Median depensation and stochasticity"),
@@ -306,13 +262,13 @@ plot_radar_interaction(scenario1 = kur_dep,
                        title = NULL,
                        legend = FALSE
 )
-mtext("B) High intercept, high steepness", side= 3, line = 2, font = 2, cex = 1.6)
-mtext("Recruitment stochasticity\nSD = 0.74, \u03c1 = 0.45",font = 2, side = 2, line = -2, cex = 1.2, col = col_key[2,1])
+mtext("B) High intercept, high steepness", side= 3, line = 2, font = 2, cex = 2)
+mtext("Recruitment stochasticity",font = 2, side = 2, line = -1, cex = 1.7, col = col_key[2,1])
 
 par(mar = c(3, 4, 2, 5))
 
-plot(Ct, kur_effort, type = "l", xaxt = "n", yaxt = "n", 
-     xlab = "", ylab = "", ylim = c(0,48))
+plot(Ct, kur_bottom_effort, type = "l", xaxt = "n", yaxt = "n", 
+     xlab = "", ylab = "", ylim = c(0,48), lwd = 3)
 title(xlab = "Past catch rates", ylab = "Current effort", line = 1, cex.lab = 2)
 
 
@@ -320,9 +276,9 @@ title(xlab = "Past catch rates", ylab = "Current effort", line = 1, cex.lab = 2)
 
 par(mar = c(4, 2, 2, 1))
 
-plot_radar_interaction(scenario1 = kur_hms_dep, 
-                       scenario2 = kur_hms_hyp,
-                       int = kur_hms_dep_hyp,
+plot_radar_interaction(scenario1 = kur_coastal_dep, 
+                       scenario2 = kur_coastal_hyp,
+                       int = kur_coastal_dep_hyp,
                        names = c("Median depensation",
                                  "Median hyperstability",
                                  "Median depensation and hyperstability"),
@@ -330,12 +286,12 @@ plot_radar_interaction(scenario1 = kur_hms_dep,
                        title = NULL,
                        legend = FALSE
 )
-mtext("Hyperstability\n\u03b2 = 0.53", side = 2, font = 2, line = -2, cex = 1.2, col = col_key[3,1])
-mtext("Depensation\nd = 0.06", side = 1, line =2, font = 2, cex = 1.2, col = col_key[1,1])
+mtext("Hyperstability", side = 2, font = 2, line = -2, cex = 1.6, col = col_key[3,1])
+mtext("Depensation", side = 1, line =2, font = 2, cex = 1.7, col = col_key[1,1])
 
-plot_radar_interaction(scenario1 = kur_hms_rec, 
-                       scenario2 = kur_hms_hyp,
-                       int = kur_hms_rec_hyp,
+plot_radar_interaction(scenario1 = kur_coastal_rec, 
+                       scenario2 = kur_coastal_hyp,
+                       int = kur_coastal_rec_hyp,
                        names = c("Median stochasticity",
                                  "Median hyperstability",
                                  "Median stochasticity and hyperstability"),
@@ -343,11 +299,11 @@ plot_radar_interaction(scenario1 = kur_hms_rec,
                        title = NULL,
                        legend = FALSE
 )
-mtext("Recruitment stochasticity\nSD = 0.74, \u03c1 = 0.45", side = 1,font = 2, line = 2, cex = 1.2, col = col_key[2,1])
+mtext("Recruitment stochasticity", side = 1,font = 2, line = 2, cex = 1.7, col = col_key[2,1])
 
-plot_radar_interaction(scenario1 = kur_dep, 
-                       scenario2 = kur_hyp,
-                       int = kur_dep_hyp,
+plot_radar_interaction(scenario1 = kur_bottom_dep, 
+                       scenario2 = kur_bottom_hyp,
+                       int = kur_bottom_dep_hyp,
                        names = c("Median depensation",
                                  "Median hyperstability",
                                  "Median depensation and hyperstability"),
@@ -355,12 +311,12 @@ plot_radar_interaction(scenario1 = kur_dep,
                        title = NULL,
                        legend = FALSE
 )
-mtext("Hyperstability\n\u03b2 = 0.53", side = 2, font = 2, line = -2, cex = 1.2, col = col_key[3,1])
-mtext("Depensation\nd = 0.06", side = 1, line = 2,font = 2, cex = 1.2, col = col_key[1,1])
+mtext("Hyperstability", side = 2, font = 2, line = -1, cex = 1.7, col = col_key[3,1])
+mtext("Depensation", side = 1, line = 2,font = 2, cex = 1.7, col = col_key[1,1])
 
-plot_radar_interaction(scenario1 = kur_rec, 
-                       scenario2 = kur_hyp,
-                       int = kur_rec_hyp,
+plot_radar_interaction(scenario1 = kur_bottom_rec, 
+                       scenario2 = kur_bottom_hyp,
+                       int = kur_bottom_rec_hyp,
                        names = c("Median stochasticity",
                                  "Median hyperstability",
                                  "Median stochasticity and hyperstability"),
@@ -368,11 +324,11 @@ plot_radar_interaction(scenario1 = kur_rec,
                        title = NULL,
                        legend = FALSE
 )
-mtext("Recruitment stochasticity\nSD = 0.74, \u03c1 = 0.45", side = 1,font = 2, line = 2, cex = 1.2, col = col_key[2,1])
+mtext("Recruitment stochasticity", side = 1,font = 2, line = 2, cex = 1.7, col = col_key[2,1])
 
 # row 3
 
-par(mar = c(1, 2, 4, 1))
+par(mar = c(1, 2, 4, 2))
 
 plot_radar_interaction(scenario1 = rag_dep, 
                        scenario2 = rag_rec,
@@ -384,17 +340,17 @@ plot_radar_interaction(scenario1 = rag_dep,
                        title = NULL,
                        legend = FALSE
 )
-mtext("C) Low intercept, low steepness", side= 3, line = 2, font = 2, cex = 1.6)
+mtext("C) Low intercept, low steepness", side= 3, line = 2, font = 2, cex = 2)
 
-mtext("Recruitment stochasticity\nSD = 0.74, \u03c1 = 0.45", side = 2, line = -2, cex = 1.2, col = col_key[2,1],font = 2)
+mtext("Recruitment stochasticity", side = 2, line = -2, cex = 1.7, col = col_key[2,1],font = 2)
 
 par(mar = c(3, 4, 2, 5))
 
 plot(Ct, rag_effort, type = "l", xaxt = "n", yaxt = "n", 
-     xlab = "", ylab = "", ylim = c(0,48))
+     xlab = "", ylab = "", ylim = c(0,48), lwd = 3)
 title(xlab = "Past catch rates", ylab = "Current effort", line = 1, cex.lab = 2)
 
-par(mar = c(1, 2, 4, 1))
+par(mar = c(1, 2, 4, 2))
 
 
 plot_radar_interaction(scenario1 = whi_sg_dep, 
@@ -407,20 +363,20 @@ plot_radar_interaction(scenario1 = whi_sg_dep,
                        title = NULL,
                        legend = FALSE
 )
-mtext("D) Low intercept, high steepness", side= 3, line = 2, font = 2, cex = 1.6)
-mtext("Recruitment stochasticity\nSD = 0.74, \u03c1 = 0.45", side = 2, line = -2, cex = 1.2, col = col_key[2,1],font = 2)
+mtext("D) Low intercept, high steepness", side= 3, line = 2, font = 2, cex = 2)
+mtext("Recruitment stochasticity", side = 2, line = -1, cex = 1.7, col = col_key[2,1],font = 2)
 
 par(mar = c(3, 4, 2, 5))
 
 plot(Ct, whi_sg_effort, type = "l", xaxt = "n", yaxt = "n", 
-     xlab = "", ylab = "", ylim = c(0,48))
+     xlab = "", ylab = "", ylim = c(0,48), lwd = 3)
 title(xlab = "Past catch rates", ylab = "Current effort", line = 1, cex.lab = 2)
 
 
 
 # row 4
 
-par(mar = c(4, 2, 2, 1))
+par(mar = c(5, 2, 2, 1))
 
 plot_radar_interaction(scenario1 = rag_dep, 
                        scenario2 = rag_hyp,
@@ -432,8 +388,8 @@ plot_radar_interaction(scenario1 = rag_dep,
                        title = NULL,
                        legend = FALSE
 )
-mtext("Hyperstability\n\u03b2 = 0.53", side = 2, font = 2, line = -2, cex = 1.2, col = col_key[3,1])
-mtext("Depensation\nd = 0.06", side = 1, line = 2, font = 2, cex = 1.2, col = col_key[1,1])
+mtext("Hyperstability", side = 2, font = 2, line = -2, cex = 1.7, col = col_key[3,1])
+mtext("Depensation", side = 1, line = 3, font = 2, cex = 1.7, col = col_key[1,1])
 
 plot_radar_interaction(scenario1 = rag_rec, 
                        scenario2 = rag_hyp,
@@ -445,7 +401,7 @@ plot_radar_interaction(scenario1 = rag_rec,
                        title = NULL,
                        legend = FALSE
 )
-mtext("Recruitment stochasticity\nSD = 0.74, \u03c1 = 0.45", side = 1,font = 2, line = 2, cex = 1.2, col = col_key[2,1])
+mtext("Recruitment stochasticity", side = 1,font = 2, line = 3, cex = 1.7, col = col_key[2,1])
 
 plot_radar_interaction(scenario1 = whi_sg_dep, 
                        scenario2 = whi_sg_hyp,
@@ -457,8 +413,8 @@ plot_radar_interaction(scenario1 = whi_sg_dep,
                        title = NULL,
                        legend = FALSE
 )
-mtext("Depensation\nd = 0.06", side = 1, line = 2,font = 2, cex = 1.2, col = col_key[1,1])
-mtext("Hyperstability\n\u03b2 = 0.53", side = 2, font = 2, line = -2, cex = 1.2, col = col_key[3,1])
+mtext("Depensation", side = 1, line = 3,font = 2, cex = 1.7, col = col_key[1,1])
+mtext("Hyperstability", side = 2, font = 2, line = -1, cex = 1.7, col = col_key[3,1])
 
 plot_radar_interaction(scenario1 = whi_sg_rec, 
                        scenario2 = whi_sg_hyp,
@@ -470,7 +426,6 @@ plot_radar_interaction(scenario1 = whi_sg_rec,
                        title = NULL,
                        legend = FALSE
 )
-mtext("Recruitment stochasticity\nSD = 0.74, \u03c1 = 0.45",font = 2, side = 1, line = 2, cex = 1.2, col = col_key[2,1])
-
+mtext("Recruitment stochasticity",font = 2, side = 1, line = 3, cex = 1.7, col = col_key[2,1])
 dev.off()
 graphics.off()
