@@ -15,7 +15,6 @@ outfig <- here::here("figures")
 # Save model runs using each angler effort function ----------------------------------
 
 Emax <- 48
-c50 <- 0.1
 
 outlist <- list()
 
@@ -54,7 +53,12 @@ po <- ggplot(data = mean_dat, aes(x = lambda, y = intercept))+
   labs(title = "A) Mean proportion of years\nin which pop. is overfished", y = "Probability of fishing\nwhen catch rate is zero", x = NULL)+
   geom_hline(yintercept = median(mean_dat$intercept), linetype = 2)+
   geom_vline(xintercept = median(mean_dat$lambda), linetype = 2)+
-  theme_classic()
+  theme_classic()+
+  theme(axis.text = element_text(size = 13),
+                        axis.title = element_text(size = 15),
+                        plot.title = element_text(size = 17),
+                        legend.text = element_text(size = 13),
+                        legend.title = element_text(size = 15))
 
 # proportion extirpated
 
@@ -68,7 +72,12 @@ pe <- ggplot(data = mean_dat, aes(x = lambda, y = intercept))+
   geom_hline(yintercept = median(mean_dat$intercept), linetype = 2)+
   geom_vline(xintercept = median(mean_dat$lambda), linetype = 2)+
   labs(title = "B) Proportion of simulations\nin which pop. is extirpated", x = NULL, y = NULL)+
-  theme_classic()
+  theme_classic()+
+  theme(axis.text = element_text(size = 13),
+        axis.title = element_text(size = 15),
+        plot.title = element_text(size = 17),
+        legend.text = element_text(size = 13),
+        legend.title = element_text(size = 15))
 
 # cumulative effort
 
@@ -82,7 +91,12 @@ ce <- ggplot(data = mean_dat, aes(x = lambda, y = intercept))+
   geom_hline(yintercept = median(mean_dat$intercept), linetype = 2)+
   geom_vline(xintercept = median(mean_dat$lambda), linetype = 2)+
   labs(title = "C) Cumulative fishing effort", x = NULL, y = "Probability of fishing\nwhen catch rate is zero")+
-  theme_classic()
+  theme_classic()+
+  theme(axis.text = element_text(size = 13),
+        axis.title = element_text(size = 15),
+        plot.title = element_text(size = 17),
+        legend.text = element_text(size = 13),
+        legend.title = element_text(size = 15))
 
 # cumulative catch
 
@@ -96,7 +110,12 @@ cc <- ggplot(data = mean_dat, aes(x = lambda, y = intercept))+
   geom_hline(yintercept = median(mean_dat$intercept), linetype = 2)+
   geom_vline(xintercept = median(mean_dat$lambda), linetype = 2)+
   labs(title = "D) Cumulative catch", x = NULL, y = NULL)+
-  theme_classic()
+  theme_classic()+
+  theme(axis.text = element_text(size = 13),
+        axis.title = element_text(size = 15),
+        plot.title = element_text(size = 17),
+        legend.text = element_text(size = 13),
+        legend.title = element_text(size = 15))
 
 # CV of effort
             
@@ -111,7 +130,12 @@ cve <- ggplot(data = mean_dat, aes(x = lambda, y = intercept))+
   geom_hline(yintercept = median(mean_dat$intercept), linetype = 2)+
   geom_vline(xintercept = median(mean_dat$lambda), linetype = 2)+
   labs(title = "E) Coefficient of variation of effort", x = "Steepness of angler response to catch rates (\u03bb)", y = "Probability of fishing\nwhen catch rate is zero")+
-  theme_classic()
+  theme_classic()+
+  theme(axis.text = element_text(size = 13),
+        axis.title = element_text(size = 15),
+        plot.title = element_text(size = 17),
+        legend.text = element_text(size = 13),
+        legend.title = element_text(size = 15))
 
 # CV of biomass
 
@@ -125,7 +149,12 @@ cvb <- ggplot(data = mean_dat, aes(x = lambda, y = intercept))+
   geom_vline(xintercept = median(mean_dat$lambda), linetype = 2)+
   labs(title = "F) Coefficient of variation of biomass", x = "Steepness of angler response to catch rates (\u03bb)", y = NULL)+
   scale_x_log10()+
-  theme_classic()
+  theme_classic()+
+  theme(axis.text = element_text(size = 13),
+        axis.title = element_text(size = 15),
+        plot.title = element_text(size = 17),
+        legend.text = element_text(size = 13),
+        legend.title = element_text(size = 15))
 
 bio <- po + pe + 
   plot_layout(guides = "collect")
@@ -138,7 +167,7 @@ vari <- cve + cvb +
 
 
 
-figname <- paste("fig4.png", sep = "-")
+figname <- paste(todaysdate, "fig4.png", sep = "-")
 png(paste(outfig, figname, sep = "/"), width = 10, height = 11, units = "in", res = 1000)
 
 bio / soc / vari

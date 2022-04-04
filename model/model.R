@@ -13,8 +13,8 @@ options(scipen = 999)
 
 library(here)
 library(tidyverse)
-
 library(RColorBrewer)
+library(lubridate)
 
 source("functions/model_funs.R")
 source("functions/angler_effort_funs.R")
@@ -23,7 +23,7 @@ source("functions/vis_funs.R")
 # create output path
 
 outfig <- here::here("figures")
-
+todaysdate <- today("EST")
 
 # Model parameters ----------------------------------------------------
 
@@ -41,7 +41,6 @@ R0 <- 1      # recruits per spawner at equilibrium
 RecK <- 10   # compensation ratio
 gamma <- 1   # gamma parameter of Deriso stock-recruit function
 qfish <- 0.01  #catchability coefficient
-c50 <- 0.1 # scaling parameter for catch
 
 
 # Parameters of interest --------------------------------------------------
@@ -152,7 +151,7 @@ for (y in 1:t){
     if(y >= 2){
       
       
-      Pf[y,] <- do.call(utilfun, args = list(x = Ct[y-1,], c50 = c50))
+      Pf[y,] <- do.call(utilfun, args = list(x = Ct[y-1,]))
       Et[y,] <- Emax*Pf[y,]
       f[y,] <- qfish*Et[y,]
       Ct[y,] <- catch(n = N_at_age[y-1,,], Mf = f[y,])
