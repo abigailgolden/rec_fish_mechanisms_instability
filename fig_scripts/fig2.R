@@ -40,7 +40,7 @@ out2 <- out %>%
   slice(-1) %>% 
   filter(lambda >= 0) %>% 
   left_join(locations, by = "citation") %>% 
-  mutate(lambda = signif(as.numeric(lambda), 1),
+  mutate(lambda = signif(as.numeric(lambda), 2),
          intercept = round(as.numeric(intercept), 2),
          labs = paste(species, "\n\u03bb = ", lambda, "\nintercept = ", intercept, sep = ""),
          loc_labs = paste(loc, " (", citation, ")", sep = "")) %>% 
