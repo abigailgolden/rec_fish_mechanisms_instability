@@ -1,5 +1,5 @@
-# Sensitivity analysis to determine the value of Emax that produces extirpation if sustained over time
-# Step 1
+# Sensitivity analysis to evaluate the effect of Emax on model behavior
+# Step 1: determine the value of Emax that produces extirpation if sustained over time
 
 # This script generates a version of the model with constant Emax over time steps 1-1000 and depensation, recruitment stochasticity and hyperstability turned "off"
 # The model is run within a for loop across a range of potential values of Emax
