@@ -89,9 +89,11 @@ outvar_heatmap <- function(dat, title = dat$cr_fun, dat_range, emp_dat, xlab, re
                   fill = pct_change))+
     scale_fill_distiller(type = "div", palette = "PiYG", direction = 1,
                          name = "% change in\ncumul.\nsocial\nbenefits",
-                         limits = # c(-1*max(abs(dat_range[2,4:5])),
-                                    #       max(abs(dat_range[2,4:5]))),
-                                         c(-1000,1000),
+                         limits = c(-1*max(abs(dat_range[2,4:5])), max(abs(dat_range[2,4:5]))),
+                           # c(ifelse(max(abs(dat_range[2,4:5])) < 1000, 
+                           #                 -1*max(abs(dat_range[2,4:5])), -1000),
+                           #          ifelse(max(abs(dat_range[2,4:5])) < 1000, 
+                           #                 max(abs(dat_range[2,4:5])), 1000)),
                          guide = guide_legend(order = 2),
                          na.value = "white")+
     new_scale_fill()+

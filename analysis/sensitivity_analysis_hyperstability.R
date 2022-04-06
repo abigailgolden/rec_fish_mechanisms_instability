@@ -6,8 +6,8 @@ source("model/model.R")
 source("functions/sensitivity_analysis_funs.R")
 
 
-param_vec <- c(0.001, 0, 0, 1.000, 0.02, 0.875)
-param_names <- c("d", "sd", "rho", "beta", "int", "stp")
+param_vec <- c(0.001, 0, 0, 1.000)
+param_names <- c("d", "sd", "rho", "beta")
 
 # hyperstability values
 
