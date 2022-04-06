@@ -103,8 +103,8 @@ dat_range <- dat_all %>%
   group_by(type) %>% 
   summarize(min_val = min(val),
             max_val = max(val),
-            min_change = min(pct_change),
-            max_change = max(pct_change))
+            min_change = min(pct_change, na.rm = TRUE),
+            max_change = max(pct_change, na.rm = TRUE))
 
 dep_kur_coastal_plot <- outvar_heatmap(dat = scaled_dat_kur_coastal, 
                                        ref = 0.001,
@@ -139,7 +139,7 @@ dep_whi_sg_plot <- outvar_heatmap(dat = scaled_dat_whi_sg,
                                   ylabelling = FALSE)
 
 
-emax100 <- (dep_kur_coastal_plot + dep_kur_bottom_plot) / (dep_rag_prize_plot + dep_whi_sg_plot) +plot_layout(guides = "collect")+plot_annotation(title = "Emax = 125")
+emax100 <- (dep_kur_coastal_plot + dep_kur_bottom_plot) / (dep_rag_prize_plot + dep_whi_sg_plot) +plot_layout(guides = "collect")+plot_annotation(title = "Emax = 100")
 
 
 # With Emax = 125 ----------------------------------------------------------
@@ -206,7 +206,7 @@ emax125 <- (dep_kur_coastal_plot + dep_kur_bottom_plot) / (dep_rag_prize_plot + 
 
 # Print to a single pdf ---------------------------------------------------
 figname <- paste(todaysdate, "appendix_fig3_depensation.pdf", sep = "-")
-pdf(file = paste(outfig, figname, sep = "/"), width = 8, height = 6, onefile = TRUE, title = "Depensation sensitivity analysis with varying Emax")
+pdf(file = paste(outfig, figname, sep = "/"), width = 12, height = 8, onefile = TRUE, title = "Depensation sensitivity analysis with varying Emax")
 
 emax75
 
