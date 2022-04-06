@@ -18,10 +18,10 @@ max_sd <- 0.79
 sd_range <- seq(0, round(max_sd,1), by = 0.05)
 emp_sd <- c(0.67, 0.77, 0.74, 0.78, 0.64, 0.71, 0.74)
 
-
 nsims <- 100
-
 Bmsy <- 0.00001474532
+
+
 
 sd_kur_coastal <- simulate_along(par_range = sd_range, params = param_vec, par_id = 2, utilfun = Pi_kur_coastal, Emax = 48, Bmsy = 0.00001437875, msy = 0.3998861, utilname = "kur_coastal")
 sd_kur_bottom <- simulate_along(par_range = sd_range, params = param_vec, par_id = 2, utilfun = Pi_kur_bottom, Emax = 48, Bmsy = 0.00001437875, msy = 0.3998861, utilname = "kur_bottom")
