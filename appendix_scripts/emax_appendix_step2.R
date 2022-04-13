@@ -11,6 +11,7 @@ options(scipen = 999)
 param_vec <- c(0.001, 0, 0, 1.000)
 param_names <- c("d", "sd", "rho", "beta")
 outfig <- here::here("appendix_figs")
+outdir<- here::here("sim_data")
 
 library(cowplot)
 library(gridGraphics)
@@ -24,7 +25,7 @@ library(ggpubr)
 # Assess model behavior at incrasing values of Emax -----------------------
 
 
-Emaxes <- seq(50, 1000, by = 50)
+Emaxes <- seq(50, 3000, by = 25)
 
 dat <- data.frame(name = rep(NA, length(Emaxes)*length(funlist)),
                   lambda = rep(NA, length(Emaxes)*length(funlist)),
@@ -54,9 +55,12 @@ dat <- data.frame(name = rep(NA, length(Emaxes)*length(funlist)),
      k <- k+1
    }
  }
- 
 
- dat2 <- pivot_longer(dat, cols = 5:10, 
+# save this output because the loop takes forever to run
+ 
+write.csv(dat, file = paste(outdir, "emax_sensitivity_analysis.csv", sep = "/"), row.names = FALSE)
+
+dat2 <- pivot_longer(dat, cols = 5:10, 
                       names_to = "varname", 
                       values_to = "val") %>% 
    mutate(type = ifelse(varname == "cv_effort" | varname == "cv_biomass", 
@@ -235,3 +239,240 @@ var_emax
 
 dev.off()
 graphics.off()
+
+
+
+# Find the value of E that produces MSY and extinction for each function --------
+
+# first, collect the brute-force approximations from section 1 above to give optim() a place to start
+
+Emsys <- dat %>% 
+  group_by(name) %>% 
+  filter(cumulative_catch == max(cumulative_catch))
+
+Eextincts <- dat %>% 
+  group_by(name) %>% 
+  filter(prop_extirpated == 1) %>% 
+  summarize(E_extinction = min(emax))
+
+Eextincts[15,] <- list("gent", 3000)
+Eextincts[16,] <- list("mkwara", 3000)
+
+
+# create an empty dataframe to hold the more precise estimates
+
+Es <- data.frame(citation = rep(NA, nrow(df)), 
+          species = rep(NA, nrow(df)),
+          Emsy = rep(NA, nrow(df)),
+          Eextinct = rep(NA, nrow(df)),
+          funlab = rep(NA, nrow(df)))
+
+# estimate Emsy and Eextinction for each function using optim()
+
+for (i in 1:nrow(df)){
+  
+  # define a function to find the effort that maximizes cumulative catch
+  find_emsy <- function(e, fn = funlist[[i]]){
+    test <- simulate(params = param_vec, 
+                     nsims = 2, Emax = e, 
+                     Bmsy = 0.00001437875, 
+                     msy = 0.3998861, 
+                     utilfun = fn)
+    return(mean(test$cumulative_catch))
+  }
+ 
+  # define a function to find the smallest effort that extirpates the population
+  find_eextinct <- function(e, fn = funlist[[i]]){
+    test <- simulate(params = param_vec, 
+                     nsims = 2, Emax = e, 
+                     Bmsy = 0.00001437875, 
+                     msy = 0.3998861, 
+                     utilfun = fn)
+    test$emax <- e
+    if(mean(test$prop_extirpated) == 0){
+      return(1000000)
+    }else{
+      return(mean(test$emax))
+    }
+  }
+   
+  # use optim to find these 2 values
+  
+  emsy <- Emsys %>% filter(name == names(funlist)[[i]]) %>% select(emax)
+  eextinct <- Eextincts %>% filter(name == names(funlist)[[i]]) %>% select(E_extinction)
+  
+  raw_emsy <- optim(c(emsy[1,2]), find_emsy, method = "BFGS", control = list(fnscale = -1))
+  raw_eextinct <- optim(c(eextinct), find_eextinct, method = "BFGS", control = list(maxit = 10000000))
+
+  Es[i,] <- list(df[i,1],
+                 df[i,2],
+                 raw_emsy$par,
+                 raw_eextinct$par,
+                 names(funlist)[[i]])
+}
+
+
+# add in trout and striped bass Eextinctions manually, because optim() needs a more precise starting point for them
+
+Es[10,4] <- 3445.426
+Es[11,4] <- 4411.88
+
+
+# export this dataframe for appendix table 1
+
+
+Emaxes <- arrange(Es, Emsy)
+
+write.csv(Emaxes, file = paste(outdir, "emsys=_eextinction.csv", sep = "/"), row.names = FALSE)
+
+
+# run simulations with Emax set to Emsy for each species
+
+outlist <- list()
+
+for (i in 1:length(funlist)){
+  spp_specific_dat <- simulate(params = param_vec, 
+                       nsims = 2, Emax = Es[i,3], 
+                       Bmsy = 0.00001437875, 
+                       msy = 0.3998861, 
+                       utilfun = funlist[[i]])
+  spp_specific_dat$name <- names(funlist)[[i]]
+  spp_specific_dat$lambda <- df$lambda[i]
+  spp_specific_dat$intercept <- df$intercept[i]
+  spp_specific_dat$emax <- Es[i,3]
+  outlist[[i]] <- spp_specific_dat
+  
+}
+
+outdat <- do.call(rbind, outlist)
+
+mean_dat <- outdat %>% 
+  group_by(emax, name, lambda, intercept) %>% 
+  summarize(across(1:6, mean)) %>% 
+  mutate(log_lambda = round(log(lambda),1),
+         intercept = round(intercept, 2))
+
+
+po <- ggplot(data = mean_dat, aes(x = lambda, y = intercept))+
+  geom_point(aes(color = prop_overfished), size = 4)+
+  geom_point(shape= 1, size = 4, color = "black")+
+  scale_color_distiller(type = "seq", palette = "Reds", direction = 1,
+                        name = "Proportion",
+                        limits = c(0,1))+
+  scale_x_log10()+
+  labs(title = "A) Mean proportion of years\nin which pop. is overfished", y = "Probability of fishing\nwhen catch rate is zero", x = NULL)+
+  geom_hline(yintercept = median(mean_dat$intercept), linetype = 2)+
+  geom_vline(xintercept = median(mean_dat$lambda), linetype = 2)+
+  theme_classic()+
+  theme(axis.text = element_text(size = 13),
+        axis.title = element_text(size = 15),
+        plot.title = element_text(size = 17),
+        legend.text = element_text(size = 13),
+        legend.title = element_text(size = 15))
+
+
+pe <- ggplot(data = mean_dat, aes(x = lambda, y = intercept))+
+  geom_point(aes(color = prop_extirpated), size = 4)+
+  geom_point(shape= 1, size = 4, color = "black")+
+  scale_color_distiller(type = "seq", palette = "Reds", direction = 1,
+                        name = "Proportion",
+                        limits = c(0,1))+
+  scale_x_log10()+ 
+  geom_hline(yintercept = median(mean_dat$intercept), linetype = 2)+
+  geom_vline(xintercept = median(mean_dat$lambda), linetype = 2)+
+  labs(title = "B) Proportion of simulations\nin which pop. is extirpated", x = NULL, y = NULL)+
+  theme_classic()+
+  theme(axis.text = element_text(size = 13),
+        axis.title = element_text(size = 15),
+        plot.title = element_text(size = 17),
+        legend.text = element_text(size = 13),
+        legend.title = element_text(size = 15))
+
+ce <- ggplot(data = mean_dat, aes(x = lambda, y = intercept))+
+  geom_point(aes(color = cumulative_effort), size = 4)+
+  geom_point(shape= 1, size = 4, color = "black")+
+  scale_color_distiller(type = "seq", palette = "Greens", direction = 1,
+                        name = "Cumulative\nbenefits",
+                        limits = c(0, max(mean_dat[,7:8], na.rm = TRUE)))+
+  scale_x_log10()+
+  geom_hline(yintercept = median(mean_dat$intercept), linetype = 2)+
+  geom_vline(xintercept = median(mean_dat$lambda), linetype = 2)+
+  labs(title = "C) Cumulative fishing effort", x = NULL, y = "Probability of fishing\nwhen catch rate is zero")+
+  theme_classic()+
+  theme(axis.text = element_text(size = 13),
+        axis.title = element_text(size = 15),
+        plot.title = element_text(size = 17),
+        legend.text = element_text(size = 13),
+        legend.title = element_text(size = 15))
+
+cc <- ggplot(data = mean_dat, aes(x = lambda, y = intercept))+
+  geom_point(aes(color = cumulative_catch), size = 4)+
+  geom_point(shape= 1, size = 4, color = "black")+
+  scale_color_distiller(type = "seq", palette = "Greens", direction = 1,
+                        name = "Cumulative\nbenefits",
+                        limits = c(0, max(mean_dat[,7:8], na.rm = TRUE)))+
+  scale_x_log10()+
+  geom_hline(yintercept = median(mean_dat$intercept), linetype = 2)+
+  geom_vline(xintercept = median(mean_dat$lambda), linetype = 2)+
+  labs(title = "D) Cumulative catch", x = NULL, y = NULL)+
+  theme_classic()+
+  theme(axis.text = element_text(size = 13),
+        axis.title = element_text(size = 15),
+        plot.title = element_text(size = 17),
+        legend.text = element_text(size = 13),
+        legend.title = element_text(size = 15))
+
+
+cve <- ggplot(data = mean_dat, aes(x = lambda, y = intercept))+
+  geom_point(aes(color = cv_effort), size = 4)+
+  geom_point(shape= 1, size = 4, color = "black")+
+  scale_color_distiller(type = "seq", palette = "BuPu", direction = 1,
+                        name = "Coefficient\nof variation",
+                        limits = c(0, 1))+
+  scale_x_log10()+
+  geom_hline(yintercept = median(mean_dat$intercept), linetype = 2)+
+  geom_vline(xintercept = median(mean_dat$lambda), linetype = 2)+
+  labs(title = "E) Coefficient of variation of effort", x = "Steepness of angler response to catch rates (\u03bb)", y = "Probability of fishing\nwhen catch rate is zero")+
+  theme_classic()+
+  theme(axis.text = element_text(size = 13),
+        axis.title = element_text(size = 15),
+        plot.title = element_text(size = 17),
+        legend.text = element_text(size = 13),
+        legend.title = element_text(size = 15))
+
+cvb <- ggplot(data = mean_dat, aes(x = lambda, y = intercept))+
+  geom_point(aes(color = cv_biomass), size = 4)+
+  geom_point(shape= 1, size = 4, color = "black")+
+  scale_color_distiller(type = "seq", palette = "BuPu", direction = 1,
+                        name = "Coefficient\nof variation",
+                        limits = c(0, 1))+
+  geom_hline(yintercept = median(mean_dat$intercept), linetype = 2)+
+  geom_vline(xintercept = median(mean_dat$lambda), linetype = 2)+
+  labs(title = "F) Coefficient of variation of biomass", x = "Steepness of angler response to catch rates (\u03bb)", y = NULL)+
+  scale_x_log10()+
+  theme_classic()+
+  theme(axis.text = element_text(size = 13),
+        axis.title = element_text(size = 15),
+        plot.title = element_text(size = 17),
+        legend.text = element_text(size = 13),
+        legend.title = element_text(size = 15))
+
+bio <- po + pe + 
+  plot_layout(guides = "collect")
+
+soc <- ce + cc +
+  plot_layout(guides = "collect")
+
+vari <- cve + cvb +
+  plot_layout(guides = "collect")
+
+
+figname <- paste(todaysdate, "appendix_fig_2a_spp_specific_Emax.png", sep = "-")
+png(paste(outfig, figname, sep = "/"), width = 12, height = 12, units = "in", res = 500)
+
+bio / soc / vari
+
+dev.off()
+graphics.off()
+
+      

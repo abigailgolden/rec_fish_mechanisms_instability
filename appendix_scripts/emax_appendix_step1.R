@@ -8,6 +8,8 @@
 rm(list = ls())
 source("functions/model_funs.R")
 
+library(lubridate)
+
 # create output path
 
 outfig <- here::here("appendix_figs")
