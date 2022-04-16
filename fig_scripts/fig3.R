@@ -162,7 +162,7 @@ hyp_plot <- outvar_heatmap(dat = hyp_scaled,
                            xlab = "Density-dependent catchability parameter \u03b2",
                            ylabelling = FALSE)
 
-figname <-  "fig3_kur_bottom.png"
+figname <-  paste(todaysdate, "fig3.png", sep = "_")
 png(paste(outfig, figname, sep = "/"), width = 12, height = 10, units = "in", res = 1000)
 
 (dep_plot + hyp_plot) / (sd_plot + rho_plot) + plot_layout(guides = "collect")

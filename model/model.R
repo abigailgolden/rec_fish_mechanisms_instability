@@ -150,7 +150,6 @@ for (y in 1:t){
     # starting in second time step, calculate dynamic fishing effort based on utility
     if(y >= 2){
       
-      
       Pf[y,] <- do.call(utilfun, args = list(x = CPUE[y-1,]))
       Et[y,] <- Emax*Pf[y,]
       f[y,] <- qfish*Et[y,]
@@ -207,5 +206,4 @@ outvars$prop_extirpated <- extirpation(final_rec = N_at_age[200,1,])
     return(outdat)
   }
 }
-
 
