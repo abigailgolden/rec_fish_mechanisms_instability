@@ -30,6 +30,8 @@ min_beta <- min(betas$Bc)
 max_beta <- max(betas$Bc)
 median(betas$Bc)
 
+# betas_new <- c(0.47, 0.46, 1.017, 0.825, 0.659, 0.53, 0.41, 1.7, 0.4276, 0.86, 0.49, 0.73, 0.148)
+
 ## test how sensitive the min, max and median of beta are to the presence of walleye
 betas_test <- filter(betas, species != "Sander vitreus")
 min(betas_test$Bc)
