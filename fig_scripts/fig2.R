@@ -47,14 +47,20 @@ out2 <- out %>%
   arrange(lambda) %>% 
   mutate(labs_fac = ordered(labs, unique(labs)))
 
-
 col_key <- data.frame(cols = brewer.pal(5,"Set1"), 
-                      loc = locations$loc, stringsAsFactors = FALSE)
+                      loc = ordered(c("Australia",
+                              "California",
+                              "Northeast U.S.",
+                              "New Zealand",
+                              "North Carolina")))
+
+
 out_manual <- left_join(out2, col_key, by = "loc")
 
 facet_p <- ggplot(out_manual, aes(x = Ct, y = prob))+
   geom_line(aes(color = loc), size = 1.5)+
   scale_color_manual(values = col_key$cols,
+                     labels = col_key$loc,
                      name = "Location")+
   theme_classic()+
   theme(axis.line=element_line(),
@@ -67,6 +73,7 @@ facet_p <- ggplot(out_manual, aes(x = Ct, y = prob))+
   labs(x = "Catch rate",
        y = "Proportion of max fishing effort")+
   facet_wrap(.~labs_fac, scales = "free")
+
 
 leg <- get_legend(facet_p)
 gg_leg <- as_ggplot(leg)
