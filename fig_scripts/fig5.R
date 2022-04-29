@@ -223,7 +223,7 @@ plot(Ct, whi_sg_effort, type = "l",
 
 
 figname <- paste(todaysdate,"fig5.png", sep = "-")
-png(paste(outfig, figname, sep = "/"), width = 22, height = 18, units = "in", res = 1000)
+png(paste(outfig, figname, sep = "/"), width = 22, height = 18, units = "in", res = 500)
 
 par(mar = c(1, 2, 4, 2))
 

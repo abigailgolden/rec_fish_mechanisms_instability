@@ -101,17 +101,17 @@ for (i in 1:length(funlist)){
 }
 
 
-fig2 <- ggarrange(NULL, NULL, kur_inshore, kur_hms, kur_coastal, kur_bottom, NULL, NULL,
-          NULL, NULL, whi_other, NULL, NULL, whi_mackerel, NULL, whi_billfish,
-          NULL, NULL, NULL, NULL, whi_cmp, whi_sg, NULL, NULL,
-          rag_butter, rag_reef, rag_table, rag_key, rag_prize, mkwara, gent, NULL,
-          nrow = 4, ncol = 8
+fig2 <- ggarrange(NULL, NULL, kur_inshore, kur_hms, kur_coastal, kur_bottom, NULL,
+          NULL, NULL, whi_other, NULL, NULL, whi_mackerel, whi_billfish,
+          NULL, NULL, NULL, NULL, whi_cmp, whi_sg, NULL,
+          rag_butter, rag_reef, rag_table, rag_key, rag_prize, mkwara, gent,
+          nrow = 4, ncol = 7
           )+
   annotation_custom(leg, xmin = 0.01, ymin = 0.55, xmax = 0.25)
 
 
 figname <- paste(todaysdate, "fig2.png", sep = "-")
-png(paste(outfig, figname, sep = "/"), width = 17, height = 9, units = "in", res = 1000)
+png(paste(outfig, figname, sep = "/"), width = 15, height = 8, units = "in", res = 500)
 
 annotate_figure(fig2,
                 bottom = text_grob(expression(atop("Catch rate", bolditalic("Increasing \u03bb"))), size = 16),
@@ -133,3 +133,4 @@ grid.lines(x = 0.02,
 
 dev.off()
 graphics.off()
+

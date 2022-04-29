@@ -168,7 +168,7 @@ vari <- cve + cvb +
 
 
 figname <- paste(todaysdate, "fig4.png", sep = "-")
-png(paste(outfig, figname, sep = "/"), width = 10, height = 11, units = "in", res = 1000)
+png(paste(outfig, figname, sep = "/"), width = 10, height = 11, units = "in", res = 500)
 
 bio / soc / vari
 
