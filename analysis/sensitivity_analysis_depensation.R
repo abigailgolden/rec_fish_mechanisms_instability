@@ -88,3 +88,53 @@ dev.off()
 graphics.off()
 
 
+# Create simplified figures for ppt ---------------------------------------
+
+outfig <- here::here("ppt_figs")
+
+
+bio_dat <- dat_all %>% 
+  filter(varname == "prop_overfished" | varname == "prop_extirpated") %>% 
+  mutate(varname = ordered(varname, levels = c("prop_overfished", "prop_extirpated")),
+         val_dodged = ifelse(varname == "prop_extirpated", val + 0.01,
+                             val),
+         util_scenario = ifelse(cr_fun == "rag_prize", 
+                                "Low \u03b1, low \u03bb", 
+                                ifelse(cr_fun == "whi_sg", 
+                                       "Low \u03b1, high \u03bb",
+                                       ifelse(cr_fun == "kur_coastal",
+                                              "High \u03b1, low \u03bb", 
+                                              "High \u03b1, high \u03bb"))),
+         util_scenario = ordered(util_scenario, 
+                                 levels = c("High \u03b1, low \u03bb", 
+                                            "High \u03b1, high \u03bb",
+                                            "Low \u03b1, low \u03bb", 
+                                            "Low \u03b1, high \u03bb")))
+
+cols <- c("orange", "#ca0020")
+
+figname <- paste(todaysdate, "figS2_dep_sensitivity_analysis_for_ppt.png", sep = "-")
+png(paste(outfig, figname, sep = "/"), width = 8, height = 5, units = "in", res = 1000)
+
+ggplot(bio_dat, aes(x = param_val, y = val_dodged))+
+  geom_line(aes(color = varname)
+            , size = 1)+
+  scale_color_manual(values = cols, name = "",
+                     labels = c("Proportion overfished", 
+                                "Proportion extirpated"))+
+  geom_vline(xintercept = median(emp_dep), linetype = 2, size = 0.5)+
+  #geom_vline(xintercept = 0, linetype = 1, size = 0.5)+
+  facet_wrap(util_scenario~., scales = "free")+
+  scale_x_continuous(limits = c(0, 0.301))+
+  scale_y_continuous(limits = c(0,1.01))+
+  labs(x = "Depensation parameter d",
+       y = "Proportion")+
+  theme_classic()+
+  theme(strip.background = element_blank(),
+        strip.text.x = element_text(size = 10))
+
+dev.off()
+graphics.off()
+
+
+

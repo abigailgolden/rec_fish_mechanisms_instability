@@ -30,7 +30,6 @@ min_beta <- min(betas$Bc)
 max_beta <- max(betas$Bc)
 median(betas$Bc)
 
-# betas_new <- c(0.47, 0.46, 1.017, 0.825, 0.659, 0.53, 0.41, 1.7, 0.4276, 0.86, 0.49, 0.73, 0.148)
 
 ## test how sensitive the min, max and median of beta are to the presence of walleye
 betas_test <- filter(betas, species != "Sander vitreus")
@@ -106,4 +105,54 @@ png(paste(outfig, figname, sep = "/"), width = 12, height = 10, units = "in", re
 
 dev.off()
 graphics.off()
+
+# Create simplified figures for ppt ---------------------------------------
+
+outfig <- here::here("ppt_figs")
+
+bio_dat <- dat_all %>% 
+  filter(varname == "prop_overfished" | varname == "prop_extirpated") %>% 
+  mutate(varname = ordered(varname, levels = c("prop_overfished", "prop_extirpated")),
+         val_dodged = ifelse(varname == "prop_extirpated", val + 0.01,
+                             val),
+         util_scenario = ifelse(cr_fun == "rag_prize", 
+                                "low \u03b1, low \u03bb", 
+                                ifelse(cr_fun == "whi_sg", 
+                                       "low \u03b1, high \u03bb",
+                                       ifelse(cr_fun == "kur_hms",
+                                              "high \u03b1, low \u03bb", 
+                                              "high \u03b1, high \u03bb"))),
+         util_scenario = ordered(util_scenario, 
+                                 levels = c("high \u03b1, low \u03bb", 
+                                            "high \u03b1, high \u03bb",
+                                            "low \u03b1, low \u03bb",
+                                            "low \u03b1, high \u03bb")))
+
+cols <- c("orange", "#ca0020")
+outfig <- here::here("figures")
+
+figname <- paste(todaysdate, "figS4_hyp_sensitivity_analysis_for_ppt.png", sep = "-")
+png(paste(outfig, figname, sep = "/"), width = 8, height = 5, units = "in", res = 1000)
+
+ggplot(bio_dat, aes(x = param_val, y = val_dodged))+
+  geom_line(aes(color = varname)
+            #, linetype = varname
+            , size = 1)+
+  scale_color_manual(values = cols,
+                     name = "",
+                     labels = c("Proportion overfished", 
+                                "Proportion extirpated"))+
+  geom_vline(xintercept = median(emp_b), linetype = 2, size = 0.5)+
+  facet_wrap(util_scenario~., scales = "free")+
+  scale_x_continuous(limits = c(0.4, 1.7))+
+  scale_y_continuous(limits = c(0,1.01))+
+  labs(x = "Density-dependent catchability parameter \u03b2",
+       y = "Proportion")+
+  theme_classic()+
+  theme(strip.background = element_blank(),
+        strip.text.x = element_text(size = 10))
+
+dev.off()
+graphics.off()
+
 

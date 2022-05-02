@@ -144,3 +144,99 @@ dev.off()
 graphics.off()
 
 
+# Create simplified figures for ppt ---------------------------------------
+
+outfig <- here::here("ppt_figs")
+
+sd_dat_all <- rbind(sd_scaled_dat_kur_coastal,
+                    sd_scaled_dat_kur_bottom,
+                    sd_scaled_dat_rag_prize,
+                    sd_scaled_dat_whi_sg)
+
+sd_bio_dat <- sd_dat_all %>% 
+  filter(varname == "prop_overfished" | varname == "prop_extirpated") %>% 
+  mutate(varname = ordered(varname, levels = c("prop_overfished", "prop_extirpated")),
+         val_dodged = ifelse(varname == "prop_extirpated", val + 0.01,
+                             val),
+         util_scenario = ifelse(cr_fun == "rag_prize", 
+                                "Low \u03b1, low \u03bb", 
+                                ifelse(cr_fun == "whi_sg", 
+                                       "Low \u03b1, high \u03bb",
+                                       ifelse(cr_fun == "kur_coastal",
+                                              "High \u03b1, low \u03bb", 
+                                              "High \u03b1, high \u03bb"))),
+         util_scenario = ordered(util_scenario, 
+                                 levels = c("High \u03b1, low \u03bb", 
+                                            "High \u03b1, high \u03bb",
+                                            "Low \u03b1, low \u03bb", 
+                                            "Low \u03b1, high \u03bb")))
+
+cols <- c("orange", "#ca0020")
+
+figname <- paste(todaysdate, "figS2_rec_sd_for_ppt.png", sep = "-")
+png(paste(outfig, figname, sep = "/"), width = 8, height = 5, units = "in", res = 1000)
+
+ggplot(sd_bio_dat, aes(x = param_val, y = val_dodged))+
+  geom_line(aes(color = varname)
+            , size = 1)+
+  scale_color_manual(values = cols, name = "",
+                     labels = c("Proportion overfished", 
+                                "Proportion extirpated"))+
+  geom_vline(xintercept = median(emp_sd), linetype = 2, size = 0.5)+
+  facet_wrap(util_scenario~., scales = "free")+
+  scale_x_continuous(limits = c(0, 0.8))+
+  scale_y_continuous(limits = c(0,1.01))+
+  labs(x = "Standard deviation of recruitment stochasticity",
+       y = "Proportion")+
+  theme_classic()+
+  theme(strip.background = element_blank(),
+        strip.text.x = element_text(size = 10))
+
+dev.off()
+graphics.off()
+
+
+rho_dat_all <- rbind(rho_scaled_dat_kur_bottom,
+                     rho_scaled_dat_kur_coastal,
+                     rho_scaled_dat_rag_prize,
+                     rho_scaled_dat_whi_sg)
+
+rho_bio_dat <- rho_dat_all %>% 
+  filter(varname == "prop_overfished" | varname == "prop_extirpated") %>% 
+  mutate(varname = ordered(varname, levels = c("prop_overfished", "prop_extirpated")),
+         val_dodged = ifelse(varname == "prop_extirpated", val + 0.01,
+                             val),
+         util_scenario = ifelse(cr_fun == "rag_prize", 
+                                "Low \u03b1, low \u03bb", 
+                                ifelse(cr_fun == "whi_sg", 
+                                       "Low \u03b1, high \u03bb",
+                                       ifelse(cr_fun == "kur_coastal",
+                                              "High \u03b1, low \u03bb", 
+                                              "High \u03b1, high \u03bb"))),
+         util_scenario = ordered(util_scenario, 
+                                 levels = c("High \u03b1, low \u03bb", 
+                                            "High \u03b1, high \u03bb",
+                                            "Low \u03b1, low \u03bb", 
+                                            "Low \u03b1, high \u03bb")))
+
+figname <- paste(todaysdate, "figS3_rec_rho_sensitivity_analysis_for_ppt.png", sep = "-")
+png(paste(outfig, figname, sep = "/"), width = 8, height = 5, units = "in", res = 1000)
+
+ggplot(rho_bio_dat, aes(x = param_val, y = val_dodged))+
+  geom_line(aes(color = varname)
+            , size = 1)+
+  scale_color_manual(values = cols, name = "",
+                     labels = c("Proportion overfished", 
+                                "Proportion extirpated"))+
+  geom_vline(xintercept = median(emp_rho), linetype = 2, size = 0.5)+
+  facet_wrap(util_scenario~., scales = "free")+
+  scale_x_continuous(limits = c(0, 0.5))+
+  scale_y_continuous(limits = c(0,1.01))+
+  labs(x = "Autocorrelation parameter \u03c1",
+       y = "Proportion")+
+  theme_classic()+
+  theme(strip.background = element_blank(),
+        strip.text.x = element_text(size = 10))
+
+dev.off()
+graphics.off()
