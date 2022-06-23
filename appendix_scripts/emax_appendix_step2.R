@@ -1,5 +1,5 @@
 # Sensitivity analysis to evaluate the effect of Emax on model behavior
-# Step 2: see how the model responds to eacj angler effort function in the presence of different values of Emax
+# Step 2: see how the model responds to each angler effort function in the presence of different values of Emax
 
 rm(list = ls())
 
