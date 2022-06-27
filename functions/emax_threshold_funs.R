@@ -37,6 +37,7 @@ beta <- 1   ## when beta = 1, relationship between abundance and CPUE is linear
 
 
 param_vec <- c(d, sdrec, rho, beta)
+param_names <- c("d", "sd", "rho", "beta")
 
 
 # Calculated parameters -------------------------------------------------
@@ -71,9 +72,9 @@ msy <-   0.3998698  # based on angler effort for Whitehead et al. mackerel
 nsims <- 100
 
 
-# Model -------------------------------------------------------------------
+# Function to calculate the threshold of Emax that produces extinction -------------------------------------------------------------------
 
-ext_thresh <- function(params, Emaxes, utilfun, Bmsy, msy, utilname){
+ext_thresh <- function(params, Emaxes, utilfun, Bmsy, msy){
   
 out <- data.frame(Emax = numeric(), Bt = numeric(), Ct = numeric())
 Emax <- Emaxes
@@ -167,5 +168,28 @@ return(e_extinction)
 
 }
 
-ext_thresh(params = c(0.3,0,0,1), Emaxes = c(0:1000),
-           utilfun = "Pi_whi_sg", Bmsy = Bmsy, msy = msy, utilname = "snapper-grouper")
+
+# Function to run this sensitivity analysis across multiple parameter values ---------
+
+emax_thresh <- function(par_range, params, par_id, utilfun, Emaxes, Bmsy, msy, utilname){
+  range <- par_range
+  params <- param_vec
+  outdat <- data.frame(Emax = rep(NA, length(range)),
+                       param_name = rep(NA, length(range)),
+                       param_val = rep(NA, length(range)),
+                       utilfun = rep(NA, length(range)))
+  progress_bar = txtProgressBar(min=0, max=length(range), style = 1, char="=")
+  
+  for (i in 1:length(range)){
+    params[par_id] <- range[i]
+    dat <- ext_thresh(params = params, Emaxes, Bmsy = Bmsy, utilfun = utilfun)
+    dat$param_name <- param_names[par_id]
+    dat$param_val <- range[i]
+    dat$utilfun <- utilname
+    outdat[i,] <- dat
+    setTxtProgressBar(progress_bar, value = i)
+  }
+  close(progress_bar)
+  return(outdat)
+}
+
