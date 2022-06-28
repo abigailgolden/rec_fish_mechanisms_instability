@@ -1,11 +1,13 @@
 # Script to implement John Post's idea to rerun sensitivity analysis by calculating the value of Emax at which each parameter value extirpates the population
 
 rm(list = ls())
-source("functions/emax_threshold_functions.R")
-
+source("functions/emax_threshold_funs.R")
+outdir<- here::here("sim_data")
 
 
 # Depensation -------------------------------------------------------------
+
+param_vec <- c(0.001, 0, 0, 1.000)
 
 dep_emax_kur_coastal <- emax_thresh(par_range = seq(0.001, 0.301, by = 0.01), 
                                     params = param_vec, par_id = 1, utilfun = Pi_kur_hms, 
@@ -17,7 +19,7 @@ dep_emax_kur_bottom <- emax_thresh(par_range = seq(0.001, 0.301, by = 0.01),
                                     utilname = "High \u03b1, high \u03bb")
 dep_emax_rag_prize <- emax_thresh(par_range = seq(0.001, 0.301, by = 0.01), 
                                     params = param_vec, par_id = 1, utilfun = Pi_rag_prize, 
-                                    Emaxes = seq(1, 1501, by = 5), Bmsy = 0.00001436646,
+                                    Emaxes = seq(1, 3001, by = 5), Bmsy = 0.00001436646,
                                     utilname = "Low \u03b1, low \u03bb")
 dep_emax_whi_sg <- emax_thresh(par_range = seq(0.001, 0.301, by = 0.01), 
                         params = param_vec, par_id = 1, utilfun = Pi_whi_sg, 
@@ -25,10 +27,19 @@ dep_emax_whi_sg <- emax_thresh(par_range = seq(0.001, 0.301, by = 0.01),
                         utilname = "Low \u03b1, high \u03bb")
 
 
-# fix this
-ggplot(data = dep_emax, aes(x = param_val, y = Emax))+
-  geom_line()+
-  theme_classic()
+all_dep_data <- rbind(dep_emax_kur_bottom, dep_emax_kur_coastal, dep_emax_rag_prize, dep_emax_whi_sg)
+
+cols <- c("#D7191C", "#FDAE61","#91BFDB", "#2C7BB6")
+
+dep_plot <- ggplot(data = all_dep_data, aes(x = param_val, y = Emax))+
+  geom_line(aes(color = utilfun), size = 1)+
+  scale_color_manual(values = cols, name = "Angler effort\nfunction")+
+  labs( title = "A) Depensation",
+    x = "Depensation parameter d", y = "Effort that produces extirpation")+
+  theme_classic()+
+  theme(legend.position = c(0.75, 0.75))
+
+dep_plot
 
 
 # hyperstability ----------------------------------------------------------
@@ -53,3 +64,124 @@ max_beta <- max(betas$Bc)
 
 b_range <- seq(round(min_beta, 1), max_beta, by = 0.05)
 emp_b <- betas$Bc
+
+
+hyp_emax_kur_coastal <- emax_thresh(par_range = b_range, 
+                                    params = param_vec, par_id = 4, utilfun = Pi_kur_hms, 
+                                    Emaxes = seq(1, 1501, by = 5), Bmsy = 0.00001436646,
+                                    utilname = "High \u03b1, low \u03bb")
+hyp_emax_kur_bottom <- emax_thresh(par_range = b_range, 
+                                   params = param_vec, par_id = 4, utilfun = Pi_kur_bottom, 
+                                   Emaxes = seq(1, 1501, by = 5), Bmsy = 0.00001436646,
+                                   utilname = "High \u03b1, high \u03bb")
+hyp_emax_rag_prize <- emax_thresh(par_range = b_range, 
+                                  params = param_vec, par_id = 4, utilfun = Pi_rag_prize, 
+                                  Emaxes = seq(1, 10001, by = 5), Bmsy = 0.00001436646,
+                                  utilname = "Low \u03b1, low \u03bb")
+hyp_emax_whi_sg <- emax_thresh(par_range = b_range, 
+                               params = param_vec, par_id = 4, utilfun = Pi_whi_sg, 
+                               Emaxes = seq(1, 5001, by = 5), Bmsy = 0.00001436646,
+                               utilname = "Low \u03b1, high \u03bb")
+
+
+
+all_hyp_data <- rbind(hyp_emax_kur_bottom, hyp_emax_kur_coastal, hyp_emax_rag_prize, hyp_emax_whi_sg)
+
+
+hyp_plot <- ggplot(data = all_hyp_data, aes(x = param_val, y = Emax))+
+  geom_line(aes(color = utilfun), size = 1)+
+  scale_color_manual(values = cols, name = "Angler effort\nfunction")+
+  labs(title = "B) Density dependence in catchability",
+       x = "Density-dependent catchability parameter \u03b2", y = "Effort that produces extirpation")+
+  theme_classic()+
+  theme(legend.position = "none")
+
+hyp_plot
+
+# SD of recruitment stochasticity -----------------------------------------
+
+# set range of SD values to loop over
+max_sd <- 0.79
+sd_range <- seq(0, round(max_sd,1), by = 0.05)
+
+# empirically observed values of sd
+emp_sd <- c(0.67, 0.77, 0.74, 0.78, 0.64, 0.71, 0.74)
+
+rec_sd_emax_kur_coastal <- emax_thresh(par_range = sd_range, 
+                                    params = param_vec, par_id = 2, utilfun = Pi_kur_hms, 
+                                    Emaxes = seq(1, 1501, by = 5), Bmsy = 0.00001436646,
+                                    utilname = "High \u03b1, low \u03bb")
+rec_sd_emax_kur_bottom <- emax_thresh(par_range = sd_range, 
+                                   params = param_vec, par_id = 2, utilfun = Pi_kur_bottom, 
+                                   Emaxes = seq(1, 1501, by = 5), Bmsy = 0.00001436646,
+                                   utilname = "High \u03b1, high \u03bb")
+rec_sd_emax_rag_prize <- emax_thresh(par_range = sd_range, 
+                                  params = param_vec, par_id = 2, utilfun = Pi_rag_prize, 
+                                  Emaxes = seq(1, 10001, by = 5), Bmsy = 0.00001436646,
+                                  utilname = "Low \u03b1, low \u03bb")
+rec_sd_emax_whi_sg <- emax_thresh(par_range = sd_range, 
+                               params = param_vec, par_id = 2, utilfun = Pi_whi_sg, 
+                               Emaxes = seq(1, 5001, by = 5), Bmsy = 0.00001436646,
+                               utilname = "Low \u03b1, high \u03bb")
+
+
+all_rec_sd_data <- rbind(rec_sd_emax_kur_bottom, rec_sd_emax_kur_coastal, rec_sd_emax_rag_prize, rec_sd_emax_whi_sg)
+
+
+rec_sd_plot <- ggplot(data = all_rec_sd_data, aes(x = param_val, y = Emax))+
+  geom_line(aes(color = utilfun), size = 1)+
+  scale_color_manual(values = cols, name = "Angler effort\nfunction")+
+  labs(title = "B) SD of recruitment stochasticity",
+       x = "Standard deviation of recruitment stochasticity", 
+       y = "Effort that produces extirpation")+
+  theme_classic()+
+  theme(legend.position = "none")
+
+write.csv(all_rec_sd_data, file = paste(outdir, "emax_threshold_rec_sd.csv", sep = "/"), row.names = FALSE)
+
+
+# autocorrelation coefficient rho -----------------------------------------
+
+# set sd to equal the mean observed sd
+param_vec <- c(0.001, 0.74, 0, 1.000)
+
+max_rho <- 0.49
+rho_range <- seq(0, round(max_rho,1), by = 0.02)
+
+emp_rho <- c(0.45, 0.49, 0.42, 0.46, 0.38)
+
+
+rec_rho_emax_kur_coastal <- emax_thresh(par_range = rho_range, 
+                                       params = param_vec, par_id = 3, utilfun = Pi_kur_hms, 
+                                       Emaxes = seq(1, 1501, by = 5), Bmsy = 0.00001436646,
+                                       utilname = "High \u03b1, low \u03bb")
+rec_rho_emax_kur_bottom <- emax_thresh(par_range = rho_range, 
+                                      params = param_vec, par_id = 3, utilfun = Pi_kur_bottom, 
+                                      Emaxes = seq(1, 1501, by = 5), Bmsy = 0.00001436646,
+                                      utilname = "High \u03b1, high \u03bb")
+rec_rho_emax_rag_prize <- emax_thresh(par_range = rho_range, 
+                                     params = param_vec, par_id = 3, utilfun = Pi_rag_prize, 
+                                     Emaxes = seq(1, 10001, by = 5), Bmsy = 0.00001436646,
+                                     utilname = "Low \u03b1, low \u03bb")
+rec_rho_emax_whi_sg <- emax_thresh(par_range = rho_range, 
+                                  params = param_vec, par_id = 3, utilfun = Pi_whi_sg, 
+                                  Emaxes = seq(1, 5001, by = 5), Bmsy = 0.00001436646,
+                                  utilname = "Low \u03b1, high \u03bb")
+
+
+all_rec_rho_data <- rbind(rec_rho_emax_kur_bottom, rec_rho_emax_kur_coastal, rec_rho_emax_rag_prize, rec_rho_emax_whi_sg)
+
+rec_rho_plot <- ggplot(data = all_rec_rho_data, aes(x = param_val, y = Emax))+
+  geom_line(aes(color = utilfun), size = 1)+
+  scale_color_manual(values = cols, name = "Angler effort\nfunction")+
+  labs(title = "D) Autocorrelation in recruitment stochasticity",
+       x = "Autocorrelation parameter \u03c1", 
+       y = "Effort that produces extirpation")+
+  theme_classic()+
+  theme(legend.position = "none")
+
+
+write.csv(all_rec_rho_data, file = paste(outdir, "emax_threshold_rec_rho.csv", sep = "/"), row.names = FALSE)
+
+
+(dep_plot + rec_sd_plot) / (rec_rho_plot + hyp_plot)
