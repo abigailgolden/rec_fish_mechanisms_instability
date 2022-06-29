@@ -9,6 +9,7 @@ options(scipen = 999)
 param_vec <- c(0.001, 0, 0, 1.000)
 param_names <- c("d", "sd", "rho", "beta")
 outfig <- here::here("figures")
+outdir<- here::here("sim_data")
 
 
 
@@ -25,6 +26,8 @@ for (i in 1:length(funlist)){
                                       msy = 0.3998861, 
                                       utilfun = funlist[[i]])
   dat$name <- names(funlist)[[i]]
+  dat$citation <- df$citation[i]
+  dat$species <- df$species[i]
   dat$lambda <- df$lambda[i]
   dat$intercept <- df$intercept[i]
   outlist[[i]] <- dat
@@ -33,10 +36,29 @@ for (i in 1:length(funlist)){
 outdat <- do.call(rbind, outlist)
 
 mean_dat <- outdat %>% 
-  group_by(name, lambda, intercept) %>% 
+  group_by(name, citation, species, lambda, intercept) %>% 
   summarize(across(1:6, mean)) %>% 
-  mutate(log_lambda = round(log(lambda),1),
-         intercept = round(intercept, 2))
+  mutate(intercept = round(intercept, 2),
+         lambda = round(lambda, 3),
+         cv_effort = round(cv_effort, 2),
+         cv_biomass = round(cv_biomass, 2),
+         cumulative_effort = round(cumulative_effort, 0),
+         cumulative_catch = round(cumulative_catch, 0))
+  
+
+# Export this dataframe as results table 6
+
+table_dat <- mean_dat %>% 
+  ungroup() %>% 
+  select(citation, species, lambda, intercept, prop_overfished, prop_extirpated,
+         cumulative_catch, cumulative_effort, cv_biomass, cv_effort)
+
+colnames(table_dat) <- c("Citation", "Species", "\u03bb",
+                         "Intercept", "Prop. years overfished",
+                         "Prop. extirpated", "Cumul. catch",
+                         "Cumul. effort", "CV of biomass", "CV of effort")
+
+write.csv(table_dat, file = paste(outdir, "Table 6.csv", sep = "/"), row.names = FALSE)
 
 
 # Put together plots ------------------------------------------------------

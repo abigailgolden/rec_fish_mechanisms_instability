@@ -429,3 +429,4 @@ plot_radar_interaction(scenario1 = whi_sg_rec,
 mtext("Recruitment stochasticity",font = 2, side = 1, line = 3, cex = 1.7, col = col_key[2,1])
 dev.off()
 graphics.off()
+
