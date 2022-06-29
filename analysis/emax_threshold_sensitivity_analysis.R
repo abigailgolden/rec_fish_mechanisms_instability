@@ -3,11 +3,16 @@
 rm(list = ls())
 source("functions/emax_threshold_funs.R")
 outdir<- here::here("sim_data")
+outfig<- here::here("figures")
+
+library(patchwork)
 
 
 # Depensation -------------------------------------------------------------
 
 param_vec <- c(0.001, 0, 0, 1.000)
+
+emp_dep <- c(0.04, 0.06, 0.3)
 
 dep_emax_kur_coastal <- emax_thresh(par_range = seq(0.001, 0.301, by = 0.01), 
                                     params = param_vec, par_id = 1, utilfun = Pi_kur_hms, 
@@ -29,6 +34,9 @@ dep_emax_whi_sg <- emax_thresh(par_range = seq(0.001, 0.301, by = 0.01),
 
 all_dep_data <- rbind(dep_emax_kur_bottom, dep_emax_kur_coastal, dep_emax_rag_prize, dep_emax_whi_sg)
 
+
+write.csv(all_dep_data, file = paste(outdir, "emax_threshold_dep.csv", sep = "/"), row.names = FALSE)
+
 cols <- c("#D7191C", "#FDAE61","#91BFDB", "#2C7BB6")
 
 dep_plot <- ggplot(data = all_dep_data, aes(x = param_val, y = Emax))+
@@ -36,6 +44,8 @@ dep_plot <- ggplot(data = all_dep_data, aes(x = param_val, y = Emax))+
   scale_color_manual(values = cols, name = "Angler effort\nfunction")+
   labs( title = "A) Depensation",
     x = "Depensation parameter d", y = "Effort that produces extirpation")+
+  geom_vline(xintercept = median(emp_dep), linetype = 2)+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 10000))+
   theme_classic()+
   theme(legend.position = c(0.75, 0.75))
 
@@ -87,12 +97,17 @@ hyp_emax_whi_sg <- emax_thresh(par_range = b_range,
 
 all_hyp_data <- rbind(hyp_emax_kur_bottom, hyp_emax_kur_coastal, hyp_emax_rag_prize, hyp_emax_whi_sg)
 
+write.csv(all_hyp_data, file = paste(outdir, "emax_threshold_hyp.csv", sep = "/"), row.names = FALSE)
+
 
 hyp_plot <- ggplot(data = all_hyp_data, aes(x = param_val, y = Emax))+
   geom_line(aes(color = utilfun), size = 1)+
   scale_color_manual(values = cols, name = "Angler effort\nfunction")+
-  labs(title = "B) Density dependence in catchability",
-       x = "Density-dependent catchability parameter \u03b2", y = "Effort that produces extirpation")+
+  labs(title = "D) Density dependence in catchability",
+       x = "Density-dependent catchability parameter \u03b2", 
+       y = NULL)+
+  geom_vline(xintercept = median(emp_b), linetype = 2)+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 10000))+
   theme_classic()+
   theme(legend.position = "none")
 
@@ -127,18 +142,24 @@ rec_sd_emax_whi_sg <- emax_thresh(par_range = sd_range,
 
 all_rec_sd_data <- rbind(rec_sd_emax_kur_bottom, rec_sd_emax_kur_coastal, rec_sd_emax_rag_prize, rec_sd_emax_whi_sg)
 
+write.csv(all_rec_sd_data, file = paste(outdir, "emax_threshold_rec_sd.csv", sep = "/"), row.names = FALSE)
+
+
+all_rec_sd_data <- read.csv(paste(outdir, "emax_threshold_rec_sd.csv", sep = "/"), as.is = T)
+
 
 rec_sd_plot <- ggplot(data = all_rec_sd_data, aes(x = param_val, y = Emax))+
   geom_line(aes(color = utilfun), size = 1)+
   scale_color_manual(values = cols, name = "Angler effort\nfunction")+
   labs(title = "B) SD of recruitment stochasticity",
        x = "Standard deviation of recruitment stochasticity", 
-       y = "Effort that produces extirpation")+
+       y = NULL)+
+  geom_vline(xintercept = median(emp_sd), linetype = 2)+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 10000))+
   theme_classic()+
   theme(legend.position = "none")
 
-write.csv(all_rec_sd_data, file = paste(outdir, "emax_threshold_rec_sd.csv", sep = "/"), row.names = FALSE)
-
+rec_sd_plot
 
 # autocorrelation coefficient rho -----------------------------------------
 
@@ -171,17 +192,33 @@ rec_rho_emax_whi_sg <- emax_thresh(par_range = rho_range,
 
 all_rec_rho_data <- rbind(rec_rho_emax_kur_bottom, rec_rho_emax_kur_coastal, rec_rho_emax_rag_prize, rec_rho_emax_whi_sg)
 
+write.csv(all_rec_rho_data, file = paste(outdir, "emax_threshold_rec_rho.csv", sep = "/"), row.names = FALSE)
+
+
+all_rec_rho_data <- read.csv(paste(outdir, "emax_threshold_rec_rho.csv", sep = "/"), as.is = T)
+
 rec_rho_plot <- ggplot(data = all_rec_rho_data, aes(x = param_val, y = Emax))+
   geom_line(aes(color = utilfun), size = 1)+
   scale_color_manual(values = cols, name = "Angler effort\nfunction")+
-  labs(title = "D) Autocorrelation in recruitment stochasticity",
+  labs(title = "C) Autocorrelation in recruitment stochasticity",
        x = "Autocorrelation parameter \u03c1", 
        y = "Effort that produces extirpation")+
+  geom_vline(xintercept = median(emp_rho), linetype = 2)+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 10000))+
   theme_classic()+
   theme(legend.position = "none")
 
 
-write.csv(all_rec_rho_data, file = paste(outdir, "emax_threshold_rec_rho.csv", sep = "/"), row.names = FALSE)
+rec_rho_plot
+
+
+# Stitch plots together ---------------------------------------------------
+
+figname <- "FigX_emax_threshold.png"
+png(paste(outfig, figname, sep = "/"), width = 9, height = 6, units = "in", res = 750)
 
 
 (dep_plot + rec_sd_plot) / (rec_rho_plot + hyp_plot)
+
+dev.off()
+graphics.off()
