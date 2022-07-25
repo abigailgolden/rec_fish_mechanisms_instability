@@ -164,7 +164,7 @@ hyp_plot <- outvar_heatmap(dat = hyp_scaled,
                            ylabelling = FALSE)
 
 figname <-  paste(todaysdate, "fig4.png", sep = "_")
-png(paste(outfig, figname, sep = "/"), width = 14, height = 10, units = "in", res = 500)
+png(paste(outfig, figname, sep = "/"), width = 14, height = 10, units = "in", res = 600)
 
 (dep_plot + sd_plot) / (rho_plot + hyp_plot) + plot_layout(guides = "collect")
 

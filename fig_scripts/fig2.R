@@ -111,7 +111,7 @@ fig2 <- ggarrange(NULL, NULL, kur_inshore, kur_hms, kur_coastal, kur_bottom, NUL
 
 
 figname <- paste(todaysdate, "fig2.png", sep = "-")
-png(paste(outfig, figname, sep = "/"), width = 15, height = 8, units = "in", res = 500)
+png(paste(outfig, figname, sep = "/"), width = 15, height = 8, units = "in", res = 600)
 
 annotate_figure(fig2,
                 bottom = text_grob(expression(atop("Catch rate", bolditalic("Increasing \u03bb"))), size = 16),
