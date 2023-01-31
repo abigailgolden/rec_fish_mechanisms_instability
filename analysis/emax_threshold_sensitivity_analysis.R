@@ -138,7 +138,33 @@ figname <- "hyperstab_results_simple_blue.png"
 png(paste(outfig, figname, sep = "/"), width = 5, height = 4, units = "in", res = 750)
 
 
-hyp_simple
+hyp_plot
+
+dev.off()
+graphics.off()
+
+
+
+## plot all hyperstab results alone with high alpha high lambda jittered
+
+hyp_jittered <- all_hyp_data %>% 
+ # mutate(Emax = ifelse(utilfun == "High \u03b1, high \u03bb", Emax - 50, Emax))
+  mutate(size = ifelse(utilfun == "High \u03b1, high \u03bb", 1.75, 1))
+
+
+figname <- "hyperstab_results_all_jittered.png"
+png(paste(outfig, figname, sep = "/"), width = 5, height = 4, units = "in", res = 750)
+
+ggplot(data = hyp_jittered, aes(x = param_val, y = Emax))+
+  geom_line(aes(color = utilfun), size = hyp_jittered$size)+
+  scale_color_manual(values = cols, name = "Angler effort\nfunction")+
+  labs(title = NULL,
+       x = "Density-dependent catchability parameter \u03b2", 
+       y = "Fishing effort needed to collapse population")+
+  geom_vline(xintercept = median(emp_b), linetype = 2)+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 10000))+
+  theme_classic()+
+  theme(legend.position = "none")
 
 dev.off()
 graphics.off()
