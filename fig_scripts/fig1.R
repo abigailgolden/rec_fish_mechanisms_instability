@@ -136,7 +136,39 @@ hyp <- ggplot(data = hyp_dat_clean, aes(x = n, y = cpue))+
   )+
   theme(axis.text=element_blank(),
         axis.ticks=element_blank())
+
 hyp
+
+# Simplified hyperstability plot for ppt
+
+hyp_filt <- hyp_dat_clean %>% 
+  filter(b == 0.25 | b == 1 | b == 4)
+
+cols_filt <- c(cols[1], cols[3], cols[7])
+
+
+hyp_simple <- ggplot(data = hyp_filt, aes(x = n, y = cpue))+
+  geom_path(aes(color = b), size = 1)+
+  scale_color_manual(values = cols_filt)+
+  labs(x = "Abundance", y = "CPUE", color = expression(beta))+
+  #geom_text(aes(label = labs), data = hyp_dat_clean %>% filter(n == 0.5), parse = T, nudge_y = 0.0005, nudge_x = -0.01, size = 4)+
+  theme_classic()+
+  theme(legend.position = "none"
+  )+
+  theme(axis.text=element_blank(),
+        axis.ticks=element_blank())
+
+outfig <- here::here("ppt_figs")
+
+
+figname <- "hyperstab_simple.png"
+png(paste(outfig, figname, sep = "/"), width = 5, height = 4, units = "in", res = 750)
+
+
+hyp_simple
+
+dev.off()
+graphics.off()
 
 # Catch responsiveness ------------------------------------------------
 

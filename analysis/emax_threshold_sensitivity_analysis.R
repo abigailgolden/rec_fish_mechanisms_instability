@@ -54,6 +54,8 @@ dep_plot
 
 # hyperstability ----------------------------------------------------------
 
+cols <- c("#D7191C", "#FDAE61","#91BFDB", "#2C7BB6")
+
 betas <- data.frame(citation = c("Dassow et al. 2020", "Erisman et al. 2011", 
                                  "Giacomini et al. 2020", 
                                  "Hansen et al. 2005", "Hansen et al. 2005", 
@@ -112,6 +114,35 @@ hyp_plot <- ggplot(data = all_hyp_data, aes(x = param_val, y = Emax))+
   theme(legend.position = "none")
 
 hyp_plot
+
+
+## Plot only low alpha low lambda for ppt
+
+outfig <- here::here("ppt_figs")
+
+hyp_simple <- ggplot(data = hyp_emax_rag_prize, aes(x = param_val, y = Emax))+
+  geom_line(aes(color = utilfun), size = 1)+
+  scale_color_manual(values = "#2C7BB6", name = "Angler effort\nfunction")+
+  labs(title = "D) Density dependence in catchability",
+       x = "Density-dependent catchability parameter \u03b2", 
+       y = "Fishing effort needed to collapse population")+
+  geom_vline(xintercept = median(emp_b), linetype = 2)+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 10000))+
+  theme_classic()+
+  theme(legend.position = "none")
+
+hyp_simple
+
+
+figname <- "hyperstab_results_simple_blue.png"
+png(paste(outfig, figname, sep = "/"), width = 5, height = 4, units = "in", res = 750)
+
+
+hyp_simple
+
+dev.off()
+graphics.off()
+
 
 # SD of recruitment stochasticity -----------------------------------------
 
