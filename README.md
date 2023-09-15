@@ -1,6 +1,7 @@
 # Mechanisms of instability in recreational fisheries social-ecological systems
 
-This repository contains the scripts to run the model and analysis used in the manuscript "Focusing on what matters most: Evaluating multiple challenges to stability in recreational fisheries."
+This repository contains the scripts to run the model and analysis used in the following paper:
+Golden, Abigail S., Brett van Poorten, and Olaf P. Jensen. "Focusing on what matters most: Evaluating multiple challenges to stability in recreational fisheries." Fish and Fisheries 23.6 (2022): 1418-1438.
 
 ## Notes for using this repository
 
